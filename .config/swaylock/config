@@ -1,0 +1,26 @@
+color=f2f1e5
+
+inside-color=f2f1e5
+ring-color=deddd1
+line-color=deddd1
+text-color=000000
+key-hl-color=000000
+bs-hl-color=000000
+separator-color=00000000
+
+inside-ver-color=deddd1
+ring-ver-color=000000
+line-ver-color=deddd1
+text-ver-color=000000
+
+inside-wrong-color=deddd1
+ring-wrong-color=000000
+line-wrong-color=deddd1
+text-wrong-color=000000
+
+inside-clear-color=f2f1e5
+ring-clear-color=deddd1
+line-clear-color=deddd1
+text-clear-color=000000
+
+font=Iosevka Oui
