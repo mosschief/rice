@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "Theme Switcher",
+  "version": "1.0",
+  "description": "Live day/night theme sync from sway",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "theme-switcher@local",
+      "strict_min_version": "60.0"
+    }
+  },
+  "permissions": [
+    "nativeMessaging",
+    "browserSettings",
+    "theme"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  }
+}

@@ -36,9 +36,9 @@ bright6=222222
 bright7=000000
 EOF
 
-# System color scheme
+# System color scheme + Firefox live theme
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
-echo 'user_pref("ui.systemUsesDarkTheme", 0);' > ~/.config/mozilla/firefox/ogg2vqzt.default-release/user.js
+echo light > ~/.config/sway/current-theme
 
 # Claude Code theme
 sed -i 's/"theme": "dark"/"theme": "light"/' ~/.claude/settings.json
