@@ -1,14 +1,15 @@
 # Sway config - ported from i3
 # Surface Laptop 4 with linux-surface kernel
 
-font pango:Iosevka Oui 9
+font pango:Iosevka Oui 7
+titlebar_padding 4 2
 
-gaps inner 10
-gaps outer 2
+gaps inner 4
+gaps outer 0
 smart_gaps off
 
-exec_always swaymsg gaps inner all set 10
-exec_always swaymsg gaps outer all set 2
+exec_always swaymsg gaps inner all set 4
+exec_always swaymsg gaps outer all set 0
 
 default_border normal 2
 focus_follows_mouse no
@@ -37,6 +38,10 @@ set $left j
 set $right semicolon
 
 floating_modifier Mod1 normal
+
+# Theme
+bindsym F5 exec ~/.config/sway/theme-night.sh
+bindsym F6 exec ~/.config/sway/theme-day.sh
 
 # Terminal
 bindsym Mod1+Return exec foot

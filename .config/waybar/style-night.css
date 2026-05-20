@@ -1,0 +1,75 @@
+* {
+    font-family: "Iosevka Oui";
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: #1c1b16;
+    color: #f2f1e5;
+    border-bottom: 1px solid #2e2d26;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    background: transparent;
+    color: #88887e;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#workspaces button:hover {
+    background: #2e2d26;
+    color: #f2f1e5;
+}
+
+#workspaces button.focused,
+#workspaces button.active {
+    color: #f2f1e5;
+    border-bottom: 2px solid #f2f1e5;
+}
+
+#workspaces button.urgent {
+    color: #f2f1e5;
+    background: #2e2d26;
+}
+
+#mode {
+    color: #f2f1e5;
+    padding: 0 8px;
+}
+
+#clock,
+#network,
+#pulseaudio,
+#battery,
+#tray {
+    padding: 0 10px;
+    color: #f2f1e5;
+}
+
+#battery label {
+    color: #f2f1e5;
+}
+
+#clock {
+    color: #f2f1e5;
+}
+
+#battery.warning {
+    color: #88887e;
+}
+
+#battery.critical {
+    color: #f2f1e5;
+    background: #2e2d26;
+}
+
+#network.disconnected {
+    color: #88887e;
+}
+
+#pulseaudio.muted {
+    color: #88887e;
+}

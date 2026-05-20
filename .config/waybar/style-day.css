@@ -1,0 +1,75 @@
+* {
+    font-family: "Iosevka Oui";
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: #f2f1e5;
+    color: #000000;
+    border-bottom: 1px solid #deddd1;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    background: transparent;
+    color: #888888;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#workspaces button:hover {
+    background: #deddd1;
+    color: #000000;
+}
+
+#workspaces button.focused,
+#workspaces button.active {
+    color: #000000;
+    border-bottom: 2px solid #000000;
+}
+
+#workspaces button.urgent {
+    color: #000000;
+    background: #deddd1;
+}
+
+#mode {
+    color: #000000;
+    padding: 0 8px;
+}
+
+#clock,
+#network,
+#pulseaudio,
+#battery,
+#tray {
+    padding: 0 10px;
+    color: #000000;
+}
+
+#battery label {
+    color: #000000;
+}
+
+#clock {
+    color: #000000;
+}
+
+#battery.warning {
+    color: #555555;
+}
+
+#battery.critical {
+    color: #000000;
+    background: #deddd1;
+}
+
+#network.disconnected {
+    color: #888888;
+}
+
+#pulseaudio.muted {
+    color: #888888;
+}
