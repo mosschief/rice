@@ -35,3 +35,23 @@ bright5=222222
 bright6=222222
 bright7=000000
 EOF
+
+# Apply colors live to all running foot terminals
+apply_term_colors() {
+    printf '\033]10;#000000\007'  # foreground
+    printf '\033]11;#f2f1e5\007'  # background
+    printf '\033]12;#000000\007'  # cursor
+    printf '\033]4;0;#deddd1\007'
+    for i in 1 2 3 4 5 6; do printf '\033]4;%d;#444444\007' $i; done
+    printf '\033]4;7;#000000\007'
+    printf '\033]4;8;#c8c7bb\007'
+    for i in 9 10 11 12 13 14; do printf '\033]4;%d;#222222\007' $i; done
+    printf '\033]4;15;#000000\007'
+}
+
+for pid in $(pgrep -x foot); do
+    for child in $(pgrep -P "$pid"); do
+        tty=$(readlink /proc/"$child"/fd/0 2>/dev/null)
+        case "$tty" in /dev/pts/*) apply_term_colors > "$tty" ;; esac
+    done
+done
