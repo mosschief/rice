@@ -19,7 +19,7 @@ client.unfocused        #deddd1 #f2f1e5 #888888 #f2f1e5 #deddd1
 client.focused_inactive #deddd1 #f2f1e5 #888888 #f2f1e5 #deddd1
 
 # HiDPI scaling for Surface Laptop 4 (2256x1504)
-output * scale 2
+output * scale 1.75
 
 # Wallpaper
 output * bg #f2f1e5 solid_color
@@ -161,6 +161,8 @@ bindsym Mod1+r mode "resize"
 bindswitch lid:on exec swaylock && systemctl suspend
 
 # Autostart
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec waybar
 exec swayidle -w \
     timeout 300 'swaylock -f' \
