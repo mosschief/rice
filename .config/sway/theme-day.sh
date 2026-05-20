@@ -36,6 +36,12 @@ bright6=222222
 bright7=000000
 EOF
 
+# System color scheme (affects Firefox prefers-color-scheme)
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
+
+# Claude Code theme
+sed -i 's/"theme": "dark"/"theme": "light"/' ~/.claude/settings.json
+
 # Apply colors live to all running foot terminals
 apply_term_colors() {
     printf '\033]10;#000000\007'  # foreground
