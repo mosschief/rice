@@ -1,0 +1,164 @@
+# Sway config - ported from i3
+# Surface Laptop 4 with linux-surface kernel
+
+font pango:Iosevka Oui 9
+
+gaps inner 10
+gaps outer 2
+smart_gaps off
+
+exec_always swaymsg gaps inner all set 10
+exec_always swaymsg gaps outer all set 2
+
+default_border normal 2
+focus_follows_mouse no
+
+client.focused          #000000 #deddd1 #000000 #deddd1 #000000
+client.unfocused        #deddd1 #f2f1e5 #888888 #f2f1e5 #deddd1
+client.focused_inactive #deddd1 #f2f1e5 #888888 #f2f1e5 #deddd1
+
+# HiDPI scaling for Surface Laptop 4 (2256x1504)
+output * scale 2
+
+# Wallpaper
+output * bg #f2f1e5 solid_color
+
+# Touchpad
+input type:touchpad {
+    tap enabled
+    natural_scroll disabled
+    dwt enabled
+
+}
+
+set $up l
+set $down k
+set $left j
+set $right semicolon
+
+floating_modifier Mod1 normal
+
+# Terminal
+bindsym Mod1+Return exec foot
+
+# Browser
+bindsym Mod1+c exec google-chrome --ozone-platform=wayland
+
+# Kill focused window
+bindsym Mod1+Shift+q kill
+
+# App launcher
+bindsym Mod1+d exec wmenu-run
+
+# Focus
+bindsym Mod1+$left  focus left
+bindsym Mod1+$down  focus down
+bindsym Mod1+$up    focus up
+bindsym Mod1+$right focus right
+
+bindsym Mod1+Left  focus left
+bindsym Mod1+Down  focus down
+bindsym Mod1+Up    focus up
+bindsym Mod1+Right focus right
+
+# Move
+bindsym Mod1+Shift+$left  move left
+bindsym Mod1+Shift+$down  move down
+bindsym Mod1+Shift+$up    move up
+bindsym Mod1+Shift+$right move right
+
+bindsym Mod1+Shift+Left  move left
+bindsym Mod1+Shift+Down  move down
+bindsym Mod1+Shift+Up    move up
+bindsym Mod1+Shift+Right move right
+
+# Split
+bindsym Mod1+h split h
+bindsym Mod1+v split v
+
+# Fullscreen
+bindsym Mod1+f fullscreen toggle
+
+# Layout
+bindsym Mod1+s layout stacking
+bindsym Mod1+w layout tabbed
+bindsym Mod1+e layout toggle split
+
+# Floating
+bindsym Mod1+Shift+space floating toggle
+bindsym Mod1+space       focus mode_toggle
+
+# Focus parent
+bindsym Mod1+a focus parent
+
+# Scratchpad
+bindsym Mod1+Shift+minus move scratchpad
+bindsym Mod1+minus       scratchpad show
+
+# Workspaces
+bindsym Mod1+1 workspace 1
+bindsym Mod1+2 workspace 2
+bindsym Mod1+3 workspace 3
+bindsym Mod1+4 workspace 4
+bindsym Mod1+5 workspace 5
+bindsym Mod1+6 workspace 6
+bindsym Mod1+7 workspace 7
+bindsym Mod1+8 workspace 8
+bindsym Mod1+9 workspace 9
+bindsym Mod1+0 workspace 10
+
+bindsym Mod1+Shift+1 move container to workspace 1
+bindsym Mod1+Shift+2 move container to workspace 2
+bindsym Mod1+Shift+3 move container to workspace 3
+bindsym Mod1+Shift+4 move container to workspace 4
+bindsym Mod1+Shift+5 move container to workspace 5
+bindsym Mod1+Shift+6 move container to workspace 6
+bindsym Mod1+Shift+7 move container to workspace 7
+bindsym Mod1+Shift+8 move container to workspace 8
+bindsym Mod1+Shift+9 move container to workspace 9
+bindsym Mod1+Shift+0 move container to workspace 10
+
+# Sway management
+bindsym Mod1+Shift+c reload
+bindsym Mod1+Shift+r exec swaymsg reload
+bindsym Mod1+Shift+e exec swaynag -t warning -m 'Exit sway? This will end your Wayland session.' -b 'Yes, exit' 'swaymsg exit'
+
+# Lock
+bindsym Control+Mod1+l exec swaylock
+
+# Media keys
+bindsym XF86AudioPlay        exec playerctl play-pause
+bindsym XF86AudioNext        exec playerctl next
+bindsym XF86AudioPrev        exec playerctl previous
+bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym XF86AudioMute        exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+# Resize mode
+mode "resize" {
+    bindsym $left  resize shrink width  10 px or 10 ppt
+    bindsym $down  resize grow   height 10 px or 10 ppt
+    bindsym $up    resize shrink height 10 px or 10 ppt
+    bindsym $right resize grow   width  10 px or 10 ppt
+
+    bindsym Left  resize shrink width  10 px or 10 ppt
+    bindsym Down  resize grow   height 10 px or 10 ppt
+    bindsym Up    resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow   width  10 px or 10 ppt
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+bindsym Mod1+r mode "resize"
+
+# Lid close → lock then suspend
+bindswitch lid:on exec swaylock && systemctl suspend
+
+# Autostart
+exec waybar
+exec swayidle -w \
+    timeout 300 'swaylock -f' \
+    timeout 600 'swaymsg "output * dpms off"' \
+    resume      'swaymsg "output * dpms on"' \
+    before-sleep 'swaylock -f'
