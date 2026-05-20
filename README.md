@@ -10,6 +10,7 @@ Sway desktop configuration for Surface Laptop 4. Color scheme inspired by [willi
 - `.config/foot/foot.ini` — terminal
 - `.config/swaylock/config` — lock screen
 - `.config/mozilla/firefox/user.js` — Firefox portal theme settings
+- `Obsidian Vault/.obsidian/snippets/rice.css` — Obsidian color scheme snippet
 
 ## Dependencies
 
@@ -78,6 +79,22 @@ A full logout/login is required after adding these for the portal to start corre
 sudo mkdir -p /usr/lib/firefox/distribution
 sudo cp etc/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
 ```
+
+## Key bindings
+
+| Key | Action |
+|-----|--------|
+| `Alt+Return` | Terminal (foot) |
+| `Alt+C` | Firefox |
+| `Alt+O` | Obsidian |
+| `Alt+D` | App launcher (wmenu) |
+| `Alt+F5` | Night mode |
+| `Alt+F6` | Day mode |
+| `Ctrl+Alt+L` | Lock screen |
+
+## Obsidian
+
+Copy `Obsidian Vault/.obsidian/snippets/rice.css` to your vault's `.obsidian/snippets/` directory, then enable it in Settings → Appearance → CSS snippets. Uses the same three-color palette as the rest of the desktop and follows the system dark/light mode.
 
 ## Lock screen
 
