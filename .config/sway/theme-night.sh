@@ -36,8 +36,9 @@ bright6=ddddd1
 bright7=f2f1e5
 EOF
 
-# System color scheme (affects Firefox prefers-color-scheme)
+# System color scheme
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+echo 'user_pref("ui.systemUsesDarkTheme", 1);' > ~/.config/mozilla/firefox/ogg2vqzt.default-release/user.js
 
 # Claude Code theme
 sed -i 's/"theme": "light"/"theme": "dark"/' ~/.claude/settings.json
