@@ -40,8 +40,8 @@ set $right semicolon
 floating_modifier Mod1 normal
 
 # Theme
-bindsym F5 exec ~/.config/sway/theme-night.sh
-bindsym F6 exec ~/.config/sway/theme-day.sh
+bindsym Mod1+F5 exec ~/.config/sway/theme-night.sh
+bindsym Mod1+F6 exec ~/.config/sway/theme-day.sh
 
 # Terminal
 bindsym Mod1+Return exec foot
