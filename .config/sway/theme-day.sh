@@ -38,7 +38,6 @@ EOF
 
 # System color scheme + Firefox live theme
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
-echo light > ~/.config/sway/current-theme
 
 # Claude Code theme
 sed -i 's/"theme": "dark"/"theme": "light"/' ~/.claude/settings.json
