@@ -123,11 +123,6 @@
   color: var(--mff-tab-color);
 }
 
-/* Hide the favicon for tabs */
-hbox.tab-content .tab-icon-image {
-  display: none !important;
-}
-
 /* Show the favicon for tabs that are pinned */
 hbox.tab-content[pinned=true] .tab-icon-image {
   display: initial !important;
@@ -220,9 +215,6 @@ hbox.tab-content[pinned=true] .tab-text {
   font-size: var(--mff-urlbar-font-size) !important;
 }
 
-.urlbarView-favicon, .urlbarView-type-icon {
-  display: none !important;
-}
 
 #urlbar-input {
   font-size: var(--mff-urlbar-font-size) !important;
