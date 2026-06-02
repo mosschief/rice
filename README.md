@@ -12,6 +12,10 @@ Sway desktop configuration for Surface Laptop 4. Color scheme inspired by [willi
 - `.config/mozilla/firefox/user.js` — Firefox portal theme settings
 - `Obsidian Vault/.obsidian/snippets/rice.css` — Obsidian color scheme snippet
 
+## Guides
+
+- [Autodesk Fusion 360 on Arch + Sway](docs/autodesk-fusion-360.md) — running Fusion via Proton, with every non-obvious fix (startup abort, login, the black DXF dialog `Qt6WebEngineCore.dll` patch, and the Wine virtual-desktop fix for the sticky Browser panel).
+
 ## Dependencies
 
 ```
