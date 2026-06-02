@@ -83,6 +83,20 @@ app-menu entry at it.
 > Exec=/home/<user>/.autodesk_fusion/bin/fusion-direct-launch.sh
 > ```
 
+### Launching from wmenu
+
+`wmenu-run` (like `dmenu_run`) lists executables on `$PATH`, **not** `.desktop`
+files — so the app-menu entry above won't appear in it. Drop a short `fusion`
+command onto your `PATH`:
+
+```sh
+ln -sf ~/.autodesk_fusion/bin/fusion-direct-launch.sh ~/.local/bin/fusion
+```
+
+Then `Alt+D` → type `fusion` → Enter (or just run `fusion` in a terminal).
+`wmenu-run` caches its binary list, so a brand-new entry may take one refresh to
+show up.
+
 ---
 
 ## 4. Startup abort: `bcp47langs.dll.GetUserLanguages`
@@ -222,6 +236,30 @@ drop the dynamic-size block from the launcher).
 
 ---
 
+## 8. Where exported files go (Downloads symlink)
+
+Under Proton the Wine user is **`steamuser`**, so Fusion's `C:\users\steamuser\`
+maps to:
+
+```
+~/.autodesk_fusion/protonprefix/pfx/drive_c/users/steamuser/
+```
+
+A DXF saved to "Downloads" therefore lands in
+`…/users/steamuser/Downloads/` — buried in the prefix. Symlink Wine's Downloads
+to your real `~/Downloads` so exports land somewhere reachable:
+
+```sh
+WD="$HOME/.autodesk_fusion/protonprefix/pfx/drive_c/users/steamuser/Downloads"
+mv -n "$WD"/* "$HOME/Downloads/" 2>/dev/null   # rescue anything already there
+rmdir "$WD"
+ln -s "$HOME/Downloads" "$WD"
+```
+
+Now "Save to Downloads" in Fusion writes straight to `~/Downloads`. (The symlink
+lives in the prefix — redo it if the prefix is ever rebuilt.) The same trick
+works for `Documents`, `Desktop`, etc.
+
 ## Summary of what's where
 
 | Thing | Path |
@@ -230,6 +268,8 @@ drop the dynamic-size block from the launcher).
 | Prefix | `~/.autodesk_fusion/protonprefix` |
 | Fusion exe | `…/protonprefix/pfx/drive_c/Program Files/Autodesk/webdeploy/production/<hash>/Fusion360.exe` |
 | Launcher | `~/.autodesk_fusion/bin/fusion-direct-launch.sh` ([repo copy](../scripts/fusion-direct-launch.sh)) |
+| wmenu command | `~/.local/bin/fusion` → symlink to the launcher |
 | App-menu entry | `~/.local/share/applications/wine/Programs/Autodesk/Autodesk Fusion.desktop` |
 | Login handler | `~/.local/share/applications/wine/Programs/Autodesk/adskidmgr-opener.desktop` |
 | Qt patch target | `…/production/<hash>/Qt6WebEngineCore.dll` (backup `.dll.bak`) |
+| Downloads | `…/users/steamuser/Downloads` → symlink to `~/Downloads` |
