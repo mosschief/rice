@@ -12,6 +12,7 @@ Sway desktop configuration for Surface Laptop 4. Color scheme inspired by [willi
 - `.config/mozilla/firefox/user.js` — Firefox portal theme settings
 - `Obsidian Vault/.obsidian/snippets/rice.css` — Obsidian color scheme snippet
 - `.config/gtk-3.0/bookmarks` — Thunar sidebar bookmarks (SMB network shares)
+- `.config/gtk-3.0/gtk-day.css` / `gtk-night.css` — recoloured Adwaita for GTK apps (Thunar); `gtk.css` is the active copy
 
 ## Guides
 
@@ -63,6 +64,16 @@ Night mode inverts to a warm dark palette (`#1c1b16` / `#2e2d26` / `#f2f1e5`).
 Switches live: sway window colors, waybar, foot terminals, Firefox, and any app that respects `prefers-color-scheme` (e.g. Obsidian).
 
 Works via `gsettings set org.gnome.desktop.interface color-scheme` → `xdg-desktop-portal-gtk` → all GTK/Electron apps.
+
+### GTK apps (Thunar, file dialogs)
+
+GTK apps use the stock **Adwaita** theme recoloured with the rice palette via
+`~/.config/gtk-3.0/gtk.css`. The toggle scripts copy `gtk-day.css` or
+`gtk-night.css` over `gtk.css` and force running GTK apps to reparse by briefly
+clearing and resetting `gtk-theme`. Set up on a new machine by copying the
+`.config/gtk-3.0/` files into place — no extra packages needed (Adwaita ships
+with GTK). Folder icons stay Adwaita's default; swap `gtk-icon-theme-name` in
+`settings.ini` for a different icon set.
 
 ### Firefox setup
 

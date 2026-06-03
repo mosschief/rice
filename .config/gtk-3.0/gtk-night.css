@@ -1,0 +1,49 @@
+/* Rice GTK theme — NIGHT (williamjansson warm-dark palette)
+   Recolors Adwaita's named colors. The day/night toggle copies this to gtk.css. */
+
+@define-color rice_bg     #1c1b16;
+@define-color rice_accent #2e2d26;
+@define-color rice_fg     #f2f1e5;
+@define-color rice_dim    #88887e;
+
+@define-color theme_bg_color            @rice_bg;
+@define-color theme_base_color          @rice_bg;
+@define-color theme_fg_color            @rice_fg;
+@define-color theme_text_color          @rice_fg;
+@define-color theme_selected_bg_color   @rice_fg;
+@define-color theme_selected_fg_color   @rice_bg;
+@define-color theme_unfocused_bg_color  @rice_bg;
+@define-color theme_unfocused_fg_color  @rice_fg;
+@define-color theme_unfocused_base_color @rice_bg;
+@define-color theme_unfocused_selected_bg_color @rice_accent;
+@define-color insensitive_bg_color      @rice_accent;
+@define-color insensitive_fg_color      @rice_dim;
+@define-color borders                   @rice_accent;
+@define-color unfocused_borders         @rice_accent;
+@define-color warning_color             #bbbbaf;
+@define-color error_color               @rice_fg;
+@define-color success_color             #bbbbaf;
+@define-color wm_bg                     @rice_accent;
+@define-color wm_title                  @rice_fg;
+
+/* Chrome surfaces use the accent shade (title/tool/menu bars, sidebar) */
+headerbar, .titlebar,
+toolbar, .toolbar,
+menubar,
+.sidebar, .sidebar list,
+notebook header {
+  background-color: @rice_accent;
+  color: @rice_fg;
+}
+
+/* Strong monochrome selection to match the sway window colors */
+*:selected, row:selected, .view:selected {
+  background-color: @rice_fg;
+  color: @rice_bg;
+}
+
+/* Keep entries/lists flat on the dark background */
+entry, treeview, .view, list {
+  background-color: @rice_bg;
+  color: @rice_fg;
+}

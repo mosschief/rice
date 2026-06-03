@@ -39,6 +39,11 @@ EOF
 # System color scheme + Firefox live theme
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
 
+# GTK apps (Thunar, file dialogs) — swap recolored gtk.css and force a live reload
+cp ~/.config/gtk-3.0/gtk-day.css ~/.config/gtk-3.0/gtk.css
+gsettings set org.gnome.desktop.interface gtk-theme ''
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita'
+
 # Claude Code theme
 sed -i 's/"theme": "dark"/"theme": "light"/' ~/.claude/settings.json
 
