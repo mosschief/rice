@@ -72,8 +72,20 @@ GTK apps use the stock **Adwaita** theme recoloured with the rice palette via
 `gtk-night.css` over `gtk.css` and force running GTK apps to reparse by briefly
 clearing and resetting `gtk-theme`. Set up on a new machine by copying the
 `.config/gtk-3.0/` files into place — no extra packages needed (Adwaita ships
-with GTK). Folder icons stay Adwaita's default; swap `gtk-icon-theme-name` in
-`settings.ini` for a different icon set.
+with GTK).
+
+**Icons:** flat **Papirus** with grey folders to match the monochrome look.
+The folders come from a user-level overlay theme (`Papirus-Rice` /
+`Papirus-Rice-Dark`) that inherits Papirus and symlinks the grey folder variants
+— update-safe and no sudo. Set up on a new machine with:
+
+```
+sudo pacman -S papirus-icon-theme
+scripts/papirus-grey-folders.sh
+```
+
+The toggle switches `Papirus-Rice` (day) / `Papirus-Rice-Dark` (night) via
+`gsettings`.
 
 ### Firefox setup
 
