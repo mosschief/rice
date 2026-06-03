@@ -11,10 +11,12 @@ Sway desktop configuration for Surface Laptop 4. Color scheme inspired by [willi
 - `.config/swaylock/config` — lock screen
 - `.config/mozilla/firefox/user.js` — Firefox portal theme settings
 - `Obsidian Vault/.obsidian/snippets/rice.css` — Obsidian color scheme snippet
+- `.config/gtk-3.0/bookmarks` — Thunar sidebar bookmarks (SMB network shares)
 
 ## Guides
 
 - [Autodesk Fusion 360 on Arch + Sway](docs/autodesk-fusion-360.md) — running Fusion via Proton, with every non-obvious fix (startup abort, login, the black DXF dialog `Qt6WebEngineCore.dll` patch, and the Wine virtual-desktop fix for the sticky Browser panel).
+- [Network drives (SMB) in Thunar](docs/network-drives-smb.md) — browsing/mounting the Unraid SMB shares: the required `gvfs-smb` backend, avahi/mDNS discovery, `.local` resolution, and sidebar bookmarks.
 
 ## Dependencies
 
