@@ -20,6 +20,8 @@ client.focused_inactive #deddd1 #f2f1e5 #888888 #f2f1e5 #deddd1
 
 # HiDPI scaling for Surface Laptop 4 (2256x1504)
 output * scale 1.75
+output DP-2 mode 2560x1440@119.998Hz pos 0 0 scale 1.25
+output eDP-1 pos 2048 0
 
 # Wallpaper
 output * bg #f2f1e5 solid_color
