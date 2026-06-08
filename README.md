@@ -1,14 +1,18 @@
 # dotfiles
 
-Sway desktop configuration for Surface Laptop 4. Color scheme inspired by [williamjansson.com](https://williamjansson.com/files/rice/dots/).
+Sway / Hyprland desktop configuration for Surface Laptop 4. Color scheme inspired by [williamjansson.com](https://williamjansson.com/files/rice/dots/).
+
+Both compositors are configured to look and behave as identically as possible. They are installed side by side and selected at the login screen — see [Switching between Sway and Hyprland](#switching-between-sway-and-hyprland).
 
 ## Contents
 
-- `.config/sway/config` — window manager
-- `.config/sway/theme-day.sh` / `theme-night.sh` — day/night theme toggle scripts
-- `.config/waybar/` — status bar (style-day.css / style-night.css)
+- `.config/sway/config` — Sway window manager
+- `.config/sway/theme-day.sh` / `theme-night.sh` — Sway day/night theme toggle scripts
+- `.config/hypr/hyprland.conf` — Hyprland window manager (mirror of the Sway config)
+- `.config/hypr/theme-day.sh` / `theme-night.sh` — Hyprland day/night theme toggle scripts
+- `.config/waybar/` — status bar; `config.jsonc` (Sway) / `config-hypr.jsonc` (Hyprland), shared `style-day.css` / `style-night.css`
 - `.config/foot/foot.ini` — terminal
-- `.config/swaylock/config` — lock screen
+- `.config/swaylock/config` — lock screen (shared by both)
 - `.config/mozilla/firefox/user.js` — Firefox portal theme settings
 - `Obsidian Vault/.obsidian/snippets/rice.css` — Obsidian color scheme snippet
 - `.config/gtk-3.0/bookmarks` — Thunar sidebar bookmarks (SMB network shares)
@@ -25,6 +29,39 @@ Sway desktop configuration for Surface Laptop 4. Color scheme inspired by [willi
 pacman -S sway waybar foot wmenu swaylock swayidle playerctl \
           xdg-desktop-portal xdg-desktop-portal-gtk
 ```
+
+For the Hyprland session, additionally:
+
+```
+pacman -S hyprland
+```
+
+Hyprland reuses the same `swayidle` / `swaylock` / `waybar` / `foot` / `wmenu` tools as Sway — no Hyprland-native equivalents needed. The solid background is painted natively by Hyprland (`misc:background_color`), so no wallpaper daemon is required.
+
+## Switching between Sway and Hyprland
+
+Both compositors ship a Wayland session file (`sway.desktop`, `hyprland.desktop`)
+into `/usr/share/wayland-sessions/`, so once both are installed the LightDM
+greeter shows a session picker. Pick **Sway** or **Hyprland** at login — no
+toggle script or symlink swapping. Log out to switch.
+
+The two configs are kept deliberately parallel:
+
+| Concern        | Sway                              | Hyprland                                   |
+|----------------|-----------------------------------|--------------------------------------------|
+| Config         | `.config/sway/config`             | `.config/hypr/hyprland.conf`               |
+| Theme toggle   | `.config/sway/theme-*.sh`         | `.config/hypr/theme-*.sh`                  |
+| waybar         | `config.jsonc`                    | `config-hypr.jsonc` (launched with `-c`)   |
+| Background     | `output * bg` (built in)          | `misc:background_color` (built in)         |
+| Idle dpms      | `swaymsg "output * dpms off"`     | `hyprctl dispatch dpms off`                |
+| Lock / idle    | swaylock + swayidle               | swaylock + swayidle (shared)               |
+
+Keybindings, workspaces, the resize submode, day/night toggle, and window
+colors are identical between the two. A few Sway concepts have no exact
+Hyprland dispatcher and are mapped to the closest analog (noted in
+`hyprland.conf`): `layout stacking`/`tabbed` → window groups, `focus
+mode_toggle` and `focus parent` have no equivalent, and the exit binding skips
+the swaynag confirmation.
 
 ## Font
 
