@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# sketchybar — waybar analog for the rice. Minimal, three-color palette.
+# Left:  current Space indicator + focused app.  Right: volume, battery, clock.
+# Colors follow the current rice theme via ~/.config/rice/colors.sh.
+
+CONFIG_DIR="${HOME}/.config/sketchybar"
+PLUGIN_DIR="${CONFIG_DIR}/plugins"
+. "${HOME}/.config/rice/colors.sh"
+
+FONT="Iosevka Oui"   # matches the rice font (installed in ~/Library/Fonts)
+
+sketchybar --bar height=28 position=top sticky=on topmost=off display=main \
+                 padding_left=8 padding_right=8 color="${RICE_BG_ARGB}"
+
+sketchybar --default \
+    icon.font="${FONT}:Bold:13.0"  icon.color="${RICE_FG_ARGB}" \
+    label.font="${FONT}:Bold:13.0" label.color="${RICE_FG_ARGB}" \
+    background.color="${RICE_ACCENT_ARGB}" \
+    background.corner_radius=5 background.height=20 \
+    padding_left=4 padding_right=4 \
+    icon.padding_left=8 icon.padding_right=4 \
+    label.padding_left=4 label.padding_right=8
+
+# ---- left ----
+sketchybar --add item space left \
+           --set space icon="◉" update_freq=0 background.drawing=on \
+                 script="${PLUGIN_DIR}/space.sh" \
+           --subscribe space space_change
+
+sketchybar --add item front_app left \
+           --set front_app background.drawing=off \
+                 script="${PLUGIN_DIR}/front_app.sh" \
+           --subscribe front_app front_app_switched
+
+# ---- right (added right-to-left) ----
+sketchybar --add item clock right \
+           --set clock update_freq=10 background.drawing=off \
+                 script="${PLUGIN_DIR}/clock.sh"
+
+sketchybar --add item battery right \
+           --set battery update_freq=60 background.drawing=off \
+                 script="${PLUGIN_DIR}/battery.sh" \
+           --subscribe battery power_source_change
+
+sketchybar --add item volume right \
+           --set volume background.drawing=off \
+                 script="${PLUGIN_DIR}/volume.sh" \
+           --subscribe volume volume_change
+
+sketchybar --update
+echo "sketchybar configuration loaded"

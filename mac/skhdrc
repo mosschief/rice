@@ -1,0 +1,96 @@
+# skhd config — yabai keybinds ported from the Sway/i3 rice (github.com/mosschief/rice).
+# Modifier = alt (Sway Mod1). Directional keys: j=left(west) k=down(south) l=up(north) ;=right(east).
+#
+# NOTE: Workspace/Space switching (Alt+1..0) is handled by Hammerspoon + iss-cli
+# (per-monitor native Spaces), NOT here — so those keys are intentionally absent.
+#
+# yabai lives at /opt/homebrew/bin/yabai (absolute path since skhd's PATH is minimal).
+
+# ---- Launchers (Sway: foot / firefox / obsidian / wmenu) ----
+# New window each time (not just focus the existing app):
+alt - return : osascript -e 'tell application "iTerm" to create window with default profile'
+alt - c      : open -na Firefox --args --new-window
+alt - o      : open -a Obsidian
+# Sway Alt+d (wmenu) -> dmenu-style app launcher (choose)
+alt - d      : ~/.config/rice/launcher.sh
+
+# ---- Kill focused window (Sway: Alt+Shift+q) ----
+alt + shift - q : /opt/homebrew/bin/yabai -m window --close
+
+# ---- Theme toggle (Sway: Alt+F5 night / Alt+F6 day) ----
+# NB: mapped to Alt+Shift+N / Alt+Shift+D because macOS laptop F5/F6 are
+# hardware (keyboard-brightness) keys that skhd can't reliably capture.
+alt + shift - n : ~/.config/rice/theme-night.sh
+alt + shift - d : ~/.config/rice/theme-day.sh
+
+# ---- Focus (Sway: Alt + j/k/l/; and arrows) ----
+# At the display edge, focus crosses to the neighboring display
+# (Sway's output-crossing focus behavior).
+alt - j    : /opt/homebrew/bin/yabai -m window --focus west  || /opt/homebrew/bin/yabai -m display --focus west
+alt - k    : /opt/homebrew/bin/yabai -m window --focus south || /opt/homebrew/bin/yabai -m display --focus south
+alt - l    : /opt/homebrew/bin/yabai -m window --focus north || /opt/homebrew/bin/yabai -m display --focus north
+alt - 0x29 : /opt/homebrew/bin/yabai -m window --focus east  || /opt/homebrew/bin/yabai -m display --focus east
+alt - left  : /opt/homebrew/bin/yabai -m window --focus west  || /opt/homebrew/bin/yabai -m display --focus west
+alt - down  : /opt/homebrew/bin/yabai -m window --focus south || /opt/homebrew/bin/yabai -m display --focus south
+alt - up    : /opt/homebrew/bin/yabai -m window --focus north || /opt/homebrew/bin/yabai -m display --focus north
+alt - right : /opt/homebrew/bin/yabai -m window --focus east  || /opt/homebrew/bin/yabai -m display --focus east
+
+# ---- Move / rearrange window (Sway: Alt+Shift + j/k/l/; and arrows) ----
+# At the display edge the warp fails and the window crosses to the next
+# display instead (Sway's edge-crossing behavior). --display is relative to
+# the focused display, which is the window's display since skhd acts on the
+# focused window.
+alt + shift - j    : /opt/homebrew/bin/yabai -m window --warp west  || /opt/homebrew/bin/yabai -m window --display west  --focus
+alt + shift - k    : /opt/homebrew/bin/yabai -m window --warp south || /opt/homebrew/bin/yabai -m window --display south --focus
+alt + shift - l    : /opt/homebrew/bin/yabai -m window --warp north || /opt/homebrew/bin/yabai -m window --display north --focus
+alt + shift - 0x29 : /opt/homebrew/bin/yabai -m window --warp east  || /opt/homebrew/bin/yabai -m window --display east  --focus
+alt + shift - left  : /opt/homebrew/bin/yabai -m window --warp west  || /opt/homebrew/bin/yabai -m window --display west  --focus
+alt + shift - down  : /opt/homebrew/bin/yabai -m window --warp south || /opt/homebrew/bin/yabai -m window --display south --focus
+alt + shift - up    : /opt/homebrew/bin/yabai -m window --warp north || /opt/homebrew/bin/yabai -m window --display north --focus
+alt + shift - right : /opt/homebrew/bin/yabai -m window --warp east  || /opt/homebrew/bin/yabai -m window --display east  --focus
+
+# ---- Split direction (Sway: Alt+h horizontal / Alt+v vertical) ----
+alt - h : /opt/homebrew/bin/yabai -m window --insert east
+alt - v : /opt/homebrew/bin/yabai -m window --insert south
+
+# ---- Fullscreen (Sway: Alt+f) ----
+alt - f : /opt/homebrew/bin/yabai -m window --toggle zoom-fullscreen
+
+# ---- Layout (Sway: Alt+s stacking / Alt+w tabbed / Alt+e toggle split) ----
+# yabai has a single 'stack' layout (covers Sway stacking + tabbed); 'bsp' = tiling.
+alt - s : /opt/homebrew/bin/yabai -m space --layout stack
+alt - w : /opt/homebrew/bin/yabai -m space --layout stack
+alt - e : /opt/homebrew/bin/yabai -m space --layout bsp
+
+# ---- Floating (Sway: Alt+Shift+space floating toggle) ----
+alt + shift - space : /opt/homebrew/bin/yabai -m window --toggle float
+# Sway Alt+space "focus mode_toggle" and Alt+a "focus parent" have no yabai equivalent.
+# Sway scratchpad (Alt+minus / Alt+Shift+minus) needs the scripting addition; omitted.
+
+# ---- Balance / reset layout (handy extra) ----
+alt + shift - 0x2C : /opt/homebrew/bin/yabai -m space --balance   # alt+shift+/  equalize splits
+
+# ---- Reload (Sway: Alt+Shift+c / Alt+Shift+r) ----
+alt + shift - c : /opt/homebrew/bin/skhd --reload
+alt + shift - r : /opt/homebrew/bin/yabai --restart-service
+
+# ---- Lock screen (Sway: Ctrl+Alt+l) ----
+# Both variants bound because Karabiner swaps Ctrl<->Cmd in GUI apps (not terminals),
+# so physical Ctrl+Alt+L arrives as ctrl+alt-l in terminals but cmd+alt-l in GUI apps.
+ctrl + alt - l : osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'
+cmd  + alt - l : osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'
+
+# ---- Resize submode (Sway: mode "resize", entered with Alt+r) ----
+:: default : /opt/homebrew/bin/yabai -m config window_gap 4
+:: resize @
+alt - r ; resize
+resize < j    : /opt/homebrew/bin/yabai -m window --resize right:-40:0
+resize < 0x29 : /opt/homebrew/bin/yabai -m window --resize right:40:0
+resize < k    : /opt/homebrew/bin/yabai -m window --resize bottom:40:0
+resize < l    : /opt/homebrew/bin/yabai -m window --resize bottom:-40:0
+resize < left  : /opt/homebrew/bin/yabai -m window --resize right:-40:0
+resize < right : /opt/homebrew/bin/yabai -m window --resize right:40:0
+resize < down  : /opt/homebrew/bin/yabai -m window --resize bottom:40:0
+resize < up    : /opt/homebrew/bin/yabai -m window --resize bottom:-40:0
+resize < return ; default
+resize < escape ; default

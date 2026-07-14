@@ -6,6 +6,7 @@ Both compositors are configured to look and behave as identically as possible. T
 
 ## Contents
 
+- `mac/` — **macOS port** (yabai + skhd + Hammerspoon + sketchybar, SIP stays enabled) — see [mac/README.md](mac/README.md)
 - `.config/sway/config` — Sway window manager
 - `.config/sway/theme-day.sh` / `theme-night.sh` — Sway day/night theme toggle scripts
 - `.config/hypr/hyprland.conf` — Hyprland window manager (mirror of the Sway config)

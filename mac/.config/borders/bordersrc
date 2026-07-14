@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# JankyBorders — recreates Sway's window border colors:
+#   client.focused border  -> foreground  (day #000000 / night #f2f1e5)
+#   client.unfocused border-> accent       (day #deddd1 / night #2e2d26)
+# Colors follow the current rice theme via ~/.config/rice/colors.sh.
+
+. "${HOME}/.config/rice/colors.sh"
+
+options=(
+    style=round
+    width=4.0
+    hidpi=on
+    active_color="${RICE_FG_ARGB}"
+    inactive_color="${RICE_ACCENT_ARGB}"
+)
+
+borders "${options[@]}"
