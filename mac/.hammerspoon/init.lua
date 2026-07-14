@@ -41,7 +41,21 @@ local keyMap = {
 -- Serialize operations: a keypress mid-flight would corrupt a drag or leave
 -- Mission Control in a weird state.
 local busy = false
+local busySince = 0
 local function log(fmt, ...) print(string.format("[spaces] " .. fmt, ...)) end
+
+-- Hammerspoon garbage-collects unreferenced timers, which can break in-flight
+-- operation chains (and wedge `busy`). Retain every timer until it fires.
+local pending = {}
+local function after(delay, fn)
+  local t
+  t = hs.timer.doAfter(delay, function()
+    pending[t] = nil
+    fn()
+  end)
+  pending[t] = true
+  return t
+end
 
 -- 1-based index of the active space on `screen`, plus the space id list.
 local function currentSpaceIndex(screen)
@@ -64,7 +78,7 @@ local function ensureSpaces(screen, n, done)
   end
   hs.spaces.closeMissionControl()
   -- let Mission Control close and the space list settle before continuing
-  hs.timer.doAfter(0.5, done)
+  after(0.5, done)
 end
 
 -- Alt+N: switch the display under the cursor to its Nth space.
@@ -143,6 +157,7 @@ local function moveWindowToSpaceIndex(n)
         return
       end
       dragT:stop()
+      pending[dragT] = nil
       -- window is now held; step through spaces with the native shortcut
       local stepsDone = 0
       local stepT
@@ -151,8 +166,9 @@ local function moveWindowToSpaceIndex(n)
         postCtrlArrow(dir)
         if stepsDone >= count then
           stepT:stop()
+          pending[stepT] = nil
           -- wait out the last slide animation, then release
-          hs.timer.doAfter(0.6, function()
+          after(0.6, function()
             ev.newMouseEvent(ev.types.leftMouseUp,
               { x = grab.x + nudges[#nudges], y = grab.y }, dragMods):post()
             hs.mouse.absolutePosition(origPos)
@@ -160,7 +176,9 @@ local function moveWindowToSpaceIndex(n)
           end)
         end
       end)
+      pending[stepT] = true
     end)
+    pending[dragT] = true
   end)
 end
 
@@ -183,17 +201,20 @@ spaceSwitcher = hs.eventtap.new(
     local num = keyMap[event:getKeyCode()]
     if not num then return false end -- other Alt combos fall through to skhd
 
-    if busy then return true end -- swallow keypresses while an op is in flight
+    -- Swallow keypresses while an op is in flight, but never wedge: if busy
+    -- has been set for more than 6s, assume a lost callback and proceed.
+    if busy and (hs.timer.secondsSinceEpoch() - busySince) < 6 then
+      return true
+    end
     busy = true
-    -- Safety valve: never stay wedged if a callback is lost.
-    hs.timer.doAfter(6, function() busy = false end)
+    busySince = hs.timer.secondsSinceEpoch()
 
     -- Defer real work so the tap callback returns instantly (a slow callback
     -- is what gets taps disabled in the first place).
     if flags.shift then
-      hs.timer.doAfter(0, function() moveWindowToSpaceIndex(num) end)
+      after(0, function() moveWindowToSpaceIndex(num) end)
     else
-      hs.timer.doAfter(0, function() gotoSpaceIndex(num) end)
+      after(0, function() gotoSpaceIndex(num) end)
     end
     return true -- consume the keystroke
   end
