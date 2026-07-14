@@ -33,6 +33,12 @@ link "$REPO_MAC_DIR/.config/karabiner/karabiner.json" \
 echo "==> speeding up Mission Control animation (used by Alt+N space switching)"
 defaults write com.apple.dock expose-animation-duration -float 0.1
 
+echo "==> enabling ctrl+cmd+drag-anywhere window moving (used by Alt+Shift+N)"
+# The window-move drag grabs the window CENTER with ctrl+cmd held, so it works
+# on apps that draw UI in the titlebar (Firefox tabs). Apps must be relaunched
+# after this is first set.
+defaults write -g NSWindowShouldDragOnGesture -bool true
+
 echo "==> enabling native 'Move left/right a space' shortcuts (Ctrl+Arrow)"
 # Required by Alt+Shift+N (Hammerspoon holds the window and posts Ctrl+Fn+Arrow
 # so macOS itself carries the window to the next Space). Symbolic hotkeys

@@ -118,12 +118,19 @@ local function moveWindowToSpaceIndex(n)
     local count = math.abs(n - cur)
 
     local f = win:frame()
-    local grab = { x = f.x + f.w / 2, y = f.y + 5 } -- titlebar center
+    -- Grab the window CENTER with ctrl+cmd held: NSWindowShouldDragOnGesture
+    -- turns that into a window drag anywhere in the window. A titlebar grab
+    -- breaks on apps that draw UI there (Firefox tabs!). The ctrl+cmd combo
+    -- is immune to Karabiner's Ctrl<->Cmd swap (swap-invariant), and synthetic
+    -- events bypass Karabiner anyway. Apps launched before the pref was set
+    -- need a relaunch to honor it.
+    local grab = { x = f.x + f.w / 2, y = f.y + f.h / 2 }
+    local dragMods = { "ctrl", "cmd" }
     local origPos = hs.mouse.absolutePosition()
     log("move '%s': space %d -> %d on %s", win:title() or "?", cur, n, screen:name())
 
     local ev = hs.eventtap.event
-    ev.newMouseEvent(ev.types.leftMouseDown, grab):post()
+    ev.newMouseEvent(ev.types.leftMouseDown, grab, dragMods):post()
 
     -- a real drag session needs several dragged events past the drag threshold
     local nudges, i = { 8, 16, 24, 32, 40 }, 0
@@ -132,7 +139,7 @@ local function moveWindowToSpaceIndex(n)
       i = i + 1
       if i <= #nudges then
         ev.newMouseEvent(ev.types.leftMouseDragged,
-          { x = grab.x + nudges[i], y = grab.y }):post()
+          { x = grab.x + nudges[i], y = grab.y }, dragMods):post()
         return
       end
       dragT:stop()
@@ -147,7 +154,7 @@ local function moveWindowToSpaceIndex(n)
           -- wait out the last slide animation, then release
           hs.timer.doAfter(0.6, function()
             ev.newMouseEvent(ev.types.leftMouseUp,
-              { x = grab.x + nudges[#nudges], y = grab.y }):post()
+              { x = grab.x + nudges[#nudges], y = grab.y }, dragMods):post()
             hs.mouse.absolutePosition(origPos)
             busy = false
           end)

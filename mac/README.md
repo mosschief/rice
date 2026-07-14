@@ -40,12 +40,14 @@ and why — see `.hammerspoon/init.lua` for the full story:
   external monitors). Synthetic swipe-gesture tools (InstantSpaceSwitcher)
   proved flaky; `hs.spaces.moveWindowToSpace()` silently no-ops on Sequoia
   ([Hammerspoon #3698]); yabai needs SIP off for both.
-- **Moving windows** (`Alt+Shift+N`): Hammerspoon synthetically holds the
-  window's titlebar in a drag, then posts the **native**
-  `Ctrl+(Fn)+Arrow` space-switch — macOS itself carries a held window across
-  Spaces. The `fn` flag is required for synthetic arrow-key shortcuts to
-  match. Needs the "Move left/right a space" shortcuts enabled (install.sh
-  does this).
+- **Moving windows** (`Alt+Shift+N`): Hammerspoon synthetically grabs the
+  window **center** with Ctrl+Cmd held (`NSWindowShouldDragOnGesture` — set by
+  install.sh; apps launched before it's set need a relaunch), then posts the
+  **native** `Ctrl+(Fn)+Arrow` space-switch — macOS itself carries a held
+  window across Spaces. The center grab matters: a titlebar grab breaks on
+  apps that draw UI there (Firefox tabs). The `fn` flag is required for
+  synthetic arrow-key shortcuts to match. Needs the "Move left/right a space"
+  shortcuts enabled (install.sh does this).
 - **Creating workspaces**: `hs.spaces.addSpaceToScreen()` — works with SIP on.
 
 ## Install
