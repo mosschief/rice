@@ -81,7 +81,7 @@ ctrl + alt - l : osascript -e 'tell application "System Events" to keystroke "q"
 cmd  + alt - l : osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'
 
 # ---- Resize submode (Sway: mode "resize", entered with Alt+r) ----
-:: default : /opt/homebrew/bin/yabai -m config window_gap 4
+:: default : /opt/homebrew/bin/yabai -m config window_gap 14
 :: resize @
 alt - r ; resize
 resize < j    : /opt/homebrew/bin/yabai -m window --resize right:-40:0
