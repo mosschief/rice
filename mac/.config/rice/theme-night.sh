@@ -30,7 +30,7 @@ OSA
 /usr/local/bin/desktoppr "${HOME}/.config/rice/wallpapers/night.png" 2>/dev/null
 
 # borders (live update on the running instance)
-/opt/homebrew/bin/borders active_color="${RICE_FG_ARGB}" inactive_color="${RICE_ACCENT_ARGB}" 2>/dev/null
+/opt/homebrew/bin/borders active_color="${RICE_BORDER_ARGB}" inactive_color="${RICE_ACCENT_ARGB}" 2>/dev/null
 
 # sketchybar (reload re-reads colors.sh via sketchybarrc)
 /opt/homebrew/bin/sketchybar --bar color="${RICE_BG_ARGB}" 2>/dev/null

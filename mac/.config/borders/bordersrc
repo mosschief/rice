@@ -10,7 +10,7 @@ options=(
     style=round
     width=6.0
     hidpi=on
-    active_color="${RICE_FG_ARGB}"
+    active_color="${RICE_BORDER_ARGB}"
     inactive_color="${RICE_ACCENT_ARGB}"
 )
 
