@@ -170,7 +170,7 @@ Copy `Obsidian Vault/.obsidian/snippets/rice.css` to your vault's `.obsidian/sni
 
 `Ctrl+Alt+L` — locks via **hyprlock**. Lid close and 5 minutes idle also lock; lid close suspends as well.
 
-The desktop fades to black over 600ms, leaving a single rectangular password field in the middle of the screen — an outline only, with the same black inside it as the surround. Typing fills it with centred asterisks. On a correct password the lock fades back out over 600ms and the desktop fades back in — the session lock is not released until that animation finishes, so there is no flash of desktop before the fade.
+The desktop fades to black over 600ms and leaves nothing on screen at all. The password field only appears once you start typing — an outline with the same black inside it as the surround, filling with centred asterisks. It fades away again two seconds after the buffer is emptied. On a correct password the lock fades back out over 600ms and the desktop fades back in — the session lock is not released until that animation finishes, so there is no flash of desktop before the fade.
 
 Everything goes through `.config/hypr/lock.sh` rather than calling hyprlock directly. It keeps a second lock client from stacking on an existing one, and it backgrounds hyprlock so `swayidle`'s `before-sleep` hook is not blocked until the machine is unlocked (swaylock had `-f` for this; hyprlock has no equivalent). `lock.sh --now` skips the fade, which is what the suspend and lid paths use — a half-faded frame is not what you want left on the panel.
 
@@ -188,7 +188,9 @@ The lock screen uses the night palette regardless of whether the desktop is in d
 | Field outline | `#deddd1` |
 | Asterisks and text | `#f2f1e5` |
 
-`rounding = 6` and `outline_thickness = 2` are the same values as `decoration:rounding` and `general:border_size` in `hyprland.conf`, so the field looks like the window borders around it. There is no placeholder text — an empty outline is the prompt. Feedback is carried by the outline alone: it dims to `#2e2d26` while the password is checked and brightens to `#f2f1e5` when one is rejected, since the palette has no third colour to spend on it.
+`rounding = 6` and `outline_thickness = 2` are the same values as `decoration:rounding` and `general:border_size` in `hyprland.conf`, so the field looks like the window borders around it. There is no placeholder text and no visible field until a key is pressed. Feedback is carried by the outline alone: it dims to `#2e2d26` while the password is checked and brightens to `#f2f1e5` when one is rejected, since the palette has no third colour to spend on it.
+
+The hiding is `fade_on_empty`. The field's alpha starts at 0, so it does not flash on screen and then fade out when the lock comes up. `fade_timeout` has to stay non-zero: at 0 the field hides the moment the buffer empties, and since a rejected password clears the buffer, the failure message — drawn with the same alpha — would vanish before it could be read.
 
 The asterisks come from `dots_text_format`, which switches the indicator from drawn shapes to rendered text. Two settings follow from that and are easy to get wrong: `dots_size` becomes a font size rather than a fraction of the field height, and `dots_rounding` must be `0` — the rounding is applied to the glyph's texture, so the default `-1` clips every asterisk into a circle.
 
