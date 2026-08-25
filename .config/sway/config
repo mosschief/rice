@@ -4,12 +4,12 @@
 font pango:Iosevka Oui 7
 titlebar_padding 4 2
 
-gaps inner 4
-gaps outer 0
+gaps inner 8
+gaps outer 8
 smart_gaps off
 
-exec_always swaymsg gaps inner all set 4
-exec_always swaymsg gaps outer all set 0
+exec_always swaymsg gaps inner all set 8
+exec_always swaymsg gaps outer all set 8
 
 default_border normal 2
 focus_follows_mouse no
