@@ -132,7 +132,10 @@ bindsym Mod1+Shift+r exec swaymsg reload
 bindsym Mod1+Shift+e exec swaynag -t warning -m 'Exit sway? This will end your Wayland session.' -b 'Yes, exit' 'swaymsg exit'
 
 # Lock
-bindsym Control+Mod1+l exec swaylock
+# lock.sh wraps hyprlock. It lives under .config/hypr/ because that is the only
+# directory hyprlock looks in for hyprlock.conf, whichever compositor is running
+# — see the comment at the top of the script.
+bindsym Control+Mod1+l exec ~/.config/hypr/lock.sh
 
 # Media keys
 bindsym XF86AudioPlay        exec playerctl play-pause
@@ -161,14 +164,16 @@ mode "resize" {
 bindsym Mod1+r mode "resize"
 
 # Lid close → lock then suspend
-bindswitch lid:on exec swaylock && systemctl suspend
+# --now skips the fade: the screen has to be black before the machine sleeps,
+# otherwise a half-faded frame of the desktop is what is left on the panel.
+bindswitch lid:on exec ~/.config/hypr/lock.sh --now; systemctl suspend
 
 # Autostart
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec waybar
 exec swayidle -w \
-    timeout 300 'swaylock -f' \
+    timeout 300 '~/.config/hypr/lock.sh' \
     timeout 600 'swaymsg "output * dpms off"' \
     resume      'swaymsg "output * dpms on"' \
-    before-sleep 'swaylock -f'
+    before-sleep '~/.config/hypr/lock.sh --now'

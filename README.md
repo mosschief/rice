@@ -13,7 +13,8 @@ Both compositors are configured to look and behave as identically as possible. T
 - `.config/hypr/theme-day.sh` / `theme-night.sh` — Hyprland day/night theme toggle scripts
 - `.config/waybar/` — status bar; `config.jsonc` (Sway) / `config-hypr.jsonc` (Hyprland), shared `style-day.css` / `style-night.css`
 - `.config/foot/foot.ini` — terminal
-- `.config/swaylock/config` — lock screen (shared by both)
+- `.config/hypr/hyprlock.conf` — lock screen (shared by both) — see [Lock screen](#lock-screen)
+- `.config/hypr/lock.sh` — wrapper that launches hyprlock, used by every lock trigger
 - `.config/mozilla/firefox/user.js` — Firefox portal theme settings
 - `Obsidian Vault/.obsidian/snippets/rice.css` — Obsidian color scheme snippet
 - `.config/gtk-3.0/bookmarks` — Thunar sidebar bookmarks (SMB network shares)
@@ -27,7 +28,7 @@ Both compositors are configured to look and behave as identically as possible. T
 ## Dependencies
 
 ```
-pacman -S sway waybar foot wmenu swaylock swayidle playerctl \
+pacman -S sway waybar foot wmenu hyprlock swayidle playerctl \
           xdg-desktop-portal xdg-desktop-portal-gtk
 ```
 
@@ -37,7 +38,9 @@ For the Hyprland session, additionally:
 pacman -S hyprland
 ```
 
-Hyprland reuses the same `swayidle` / `swaylock` / `waybar` / `foot` / `wmenu` tools as Sway — no Hyprland-native equivalents needed. The solid background is painted natively by Hyprland (`misc:background_color`), so no wallpaper daemon is required.
+Hyprland reuses the same `swayidle` / `waybar` / `foot` / `wmenu` tools as Sway — no Hyprland-native equivalents needed. The solid background is painted natively by Hyprland (`misc:background_color`), so no wallpaper daemon is required.
+
+The lock screen goes the other way: `hyprlock` is used under Sway too. It speaks plain `ext-session-lock-v1` and needs no Hyprland IPC, so one lock config covers both sessions. swaylock is not used at all — see [Lock screen](#lock-screen) for why.
 
 ## Switching between Sway and Hyprland
 
@@ -55,7 +58,7 @@ The two configs are kept deliberately parallel:
 | waybar         | `config.jsonc`                    | `config-hypr.jsonc` (launched with `-c`)   |
 | Background     | `output * bg` (built in)          | `misc:background_color` (built in)         |
 | Idle dpms      | `swaymsg "output * dpms off"`     | `hyprctl dispatch dpms off`                |
-| Lock / idle    | swaylock + swayidle               | swaylock + swayidle (shared)               |
+| Lock / idle    | hyprlock + swayidle               | hyprlock + swayidle (shared)               |
 
 Keybindings, workspaces, the resize submode, day/night toggle, and window
 colors are identical between the two. A few Sway concepts have no exact
@@ -165,4 +168,35 @@ Copy `Obsidian Vault/.obsidian/snippets/rice.css` to your vault's `.obsidian/sni
 
 ## Lock screen
 
-`Ctrl+Alt+L` — locks via swaylock. Lid close also locks and suspends.
+`Ctrl+Alt+L` — locks via **hyprlock**. Lid close and 5 minutes idle also lock; lid close suspends as well.
+
+The desktop fades to black over 600ms, leaving a single rectangular password field in the middle of the screen. Typing fills it left to right with dots. On a correct password the lock fades back out over 600ms and the desktop fades back in — the session lock is not released until that animation finishes, so there is no flash of desktop before the fade.
+
+Everything goes through `.config/hypr/lock.sh` rather than calling hyprlock directly. It keeps a second lock client from stacking on an existing one, and it backgrounds hyprlock so `swayidle`'s `before-sleep` hook is not blocked until the machine is unlocked (swaylock had `-f` for this; hyprlock has no equivalent). `lock.sh --now` skips the fade, which is what the suspend and lid paths use — a half-faded frame is not what you want left on the panel.
+
+### Why not swaylock
+
+swaylock cannot do either half of the above. Its indicator is a hard-coded ring with no rectangular mode, and it has no fade at all — the `--fade-in` flag belongs to the swaylock-effects fork, not upstream. hyprlock has both natively: `animations:fadeIn` / `fadeOut`, and an `input-field` widget whose `rounding` makes it a rectangle.
+
+### Colours
+
+The lock screen uses the night palette regardless of whether the desktop is in day or night mode, because it fades to black either way and the dark values are the only ones that read on it. The day/night toggle scripts therefore have nothing to rewrite in `hyprlock.conf`.
+
+| Element | Hex |
+|---|---|
+| Background | `#000000` |
+| Field fill | `#1c1b16` |
+| Field outline | `#deddd1` |
+| Text and dots | `#f2f1e5` |
+
+`rounding = 6` and `outline_thickness = 2` are the same values as `decoration:rounding` and `general:border_size` in `hyprland.conf`, so the field looks like the window borders around it. Failure and "checking" states invert the fill and text colours instead of turning red or green — the palette has no third colour to spend on it.
+
+### PAM
+
+hyprlock authenticates against `/etc/pam.d/hyprlock`. The distro package installs that file, so on Arch there is nothing to do. If it is missing hyprlock falls back to `/etc/pam.d/su`, which authenticates fine but logs an error on every lock.
+
+A source build into a user prefix does not install it — it lands under the prefix, where PAM never looks. Copy it across to silence the error:
+
+```
+sudo install -m 644 ~/.local/hypr/etc/pam.d/hyprlock /etc/pam.d/hyprlock
+```
