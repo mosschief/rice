@@ -1,0 +1,207 @@
+#!/usr/bin/env bash
+# mem-breakdown — snapshot of what is actually using memory on this machine.
+#
+# Ordered so the two things that mislead you appear first:
+#
+#   1. Swap exhaustion. Memory percentage alone under-reports the problem. A
+#      machine at 83% memory looks unremarkable while swap sits at 100% full,
+#      and it is the full swap that makes everything feel slow, because every
+#      new allocation must reclaim pages before it can proceed.
+#   2. Per-process RSS. Sorting processes by RSS hides the common case on this
+#      box, which is one app fanned out across twenty node/electron children
+#      that each look small. The "grouped by app" section exists to catch that.
+#
+# Grouping keys off the command line, not the process name, because comm is
+# truncated to 15 characters and is useless for node ("MainThread") and for
+# chromium-family renderers ("Isolated Web Co").
+#
+# Grouping rules are data, not code. Without a rules file this falls back to
+# the basename of argv[0], which is right for ordinary desktop apps. Anything
+# environment-specific (work toolchains, language runtimes that all present as
+# "node", multi-process dev servers) belongs in the rules file, which is local
+# and deliberately not part of this repository:
+#
+#     ~/.config/rice/mem-groups
+#
+#     # label <glob matched against the full cmdline> <fixed label>
+#     label   *some-toolchain*        some-toolchain
+#     # regex <glob> <sed expression run over the cmdline to derive the label>
+#     regex   */projects/*            s#^.*/projects/([^/ ]+)/.*$#project:\1#
+#
+# First matching rule wins, so order them most-specific first.
+#
+# Launched from the waybar memory module. Loops on a keypress so the window
+# persists and can be refreshed in place.
+set -uo pipefail
+
+DIM=$'\033[2m'; BOLD=$'\033[1m'; RST=$'\033[0m'
+
+RULES_FILE="${MEM_GROUPS_FILE:-$HOME/.config/rice/mem-groups}"
+
+# Rules are parsed once at startup rather than per process, since label_for is
+# called several hundred times per render.
+RULE_KIND=(); RULE_GLOB=(); RULE_VALUE=()
+load_rules() {
+    [ -r "$RULES_FILE" ] || return 0
+    local kind glob value
+    while read -r kind glob value; do
+        case "$kind" in
+            ''|'#'*) continue ;;
+            label|regex) ;;
+            *) continue ;;
+        esac
+        [ -n "$glob" ] && [ -n "$value" ] || continue
+        RULE_KIND+=("$kind"); RULE_GLOB+=("$glob"); RULE_VALUE+=("$value")
+    done < "$RULES_FILE"
+}
+
+kb_to_gb() { awk -v k="${1:-0}" 'BEGIN { printf "%.2f", k / 1048576 }'; }
+
+# A stable, human-meaningful grouping key for a pid.
+label_for() {
+    local pid=$1 cmd i
+
+    cmd=$(tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null)
+
+    # Kernel threads and exited processes have no cmdline.
+    if [ -z "$cmd" ]; then
+        cat "/proc/$pid/comm" 2>/dev/null || echo '?'
+        return
+    fi
+
+    for i in "${!RULE_GLOB[@]}"; do
+        # Unquoted right-hand side so the rule is treated as a glob.
+        case "$cmd" in
+            ${RULE_GLOB[$i]})
+                if [ "${RULE_KIND[$i]}" = label ]; then
+                    printf '%s\n' "${RULE_VALUE[$i]}"
+                else
+                    printf '%s' "$cmd" | sed -E "${RULE_VALUE[$i]}"
+                fi
+                return ;;
+        esac
+    done
+
+    # Otherwise the basename of argv[0], which handles ordinary desktop apps.
+    printf '%s\n' "$(basename "${cmd%% *}")"
+}
+
+render() {
+    clear
+
+    # ---- totals ---------------------------------------------------------
+    local mt ma st sf su
+    mt=$(awk '/^MemTotal:/{print $2}'     /proc/meminfo)
+    ma=$(awk '/^MemAvailable:/{print $2}' /proc/meminfo)
+    st=$(awk '/^SwapTotal:/{print $2}'    /proc/meminfo)
+    sf=$(awk '/^SwapFree:/{print $2}'     /proc/meminfo)
+    su=$((st - sf))
+
+    printf '%s' "$BOLD"
+    printf 'memory  %s / %s GiB used' "$(kb_to_gb $((mt - ma)))" "$(kb_to_gb "$mt")"
+    printf '   %s GiB available\n' "$(kb_to_gb "$ma")"
+
+    if [ "$st" -gt 0 ]; then
+        printf 'swap    %s / %s GiB used' "$(kb_to_gb "$su")" "$(kb_to_gb "$st")"
+        awk -v u="$su" -v t="$st" 'BEGIN { printf "   %.0f%%", (u * 100) / t }'
+        # Swap with almost nothing left is the condition worth shouting about.
+        awk -v f="$sf" 'BEGIN { if (f < 262144) printf "   <-- exhausted" }'
+        printf '\n'
+    else
+        printf 'swap    none configured\n'
+    fi
+    printf '%s' "$RST"
+
+    printf '%sload   %s%s\n' "$DIM" "$(cut -d' ' -f1-3 /proc/loadavg)" "$RST"
+
+    # Pressure stall information explains a slow feel that the totals do not.
+    # "full" is the fraction of time every task was stalled waiting on that
+    # resource, so a non-trivial io/full is the machine thrashing.
+    if [ -r /proc/pressure/memory ]; then
+        local mp ip
+        mp=$(awk -F'avg10=' '/^full/{print $2}' /proc/pressure/memory | cut -d' ' -f1)
+        ip=$(awk -F'avg10=' '/^full/{print $2}' /proc/pressure/io     | cut -d' ' -f1)
+        printf '%sstall  mem %s%%  io %s%%   (fraction of time all tasks blocked)%s\n' \
+            "$DIM" "$mp" "$ip" "$RST"
+    fi
+
+    # ---- grouped by app -------------------------------------------------
+    # The section that matters most. Note RSS double-counts memory shared
+    # between processes, which is substantial for electron/chromium families,
+    # so treat these as an upper bound and a ranking, not an exact figure.
+    printf '\n%sby app%s  %s(RSS, upper bound: shared pages counted once per process)%s\n' \
+        "$BOLD" "$RST" "$DIM" "$RST"
+
+    local pid rss swap lbl
+    for d in /proc/[0-9]*; do
+        pid=${d#/proc/}
+        [ -r "$d/statm" ] || continue
+        # Field 2 of statm is resident pages; cheaper than parsing status.
+        rss=$(awk '{print $2 * 4}' "$d/statm" 2>/dev/null) || continue
+        [ -z "$rss" ] && continue
+        swap=$(awk '/^VmSwap:/{print $2}' "$d/status" 2>/dev/null)
+        printf '%s\t%s\t%s\n' "$(label_for "$pid")" "$rss" "${swap:-0}"
+    done | awk -F'\t' '
+        { rss[$1] += $2; swp[$1] += $3; n[$1]++ }
+        END { for (k in rss) printf "%d\t%d\t%d\t%s\n", rss[k], swp[k], n[k], k }
+    ' | sort -rn | head -14 | awk -F'\t' '
+        {
+            printf "  %7.2f GiB", $1 / 1048576
+            # Both branches must occupy the same width or the count column
+            # below drifts for any group that has nothing swapped out.
+            if ($2 > 51200) printf "  %6.0f MiB swap", $2 / 1024
+            else            printf "  %15s", ""
+            printf "  x%-3d  %s\n", $3, $4
+        }
+    '
+
+    # ---- individual processes -------------------------------------------
+    # Tab-delimited because comm contains spaces ("Isolated Web Co"), which
+    # whitespace-splitting would truncate at the first word.
+    printf '\n%stop processes%s\n' "$BOLD" "$RST"
+    ps -eo rss=,pid=,etime=,comm= --sort=-rss 2>/dev/null | head -10 \
+        | sed -E 's/^ *([0-9]+) +([0-9]+) +([^ ]+) +(.*)$/\1\t\2\t\3\t\4/' \
+        | awk -F'\t' '
+            { printf "  %7.2f GiB  pid %-8s %-12s %s\n", $1 / 1048576, $2, $3, $4 }
+        '
+
+    # ---- swap holders ---------------------------------------------------
+    # Distinct from the list above: a process can hold a lot of swap while
+    # showing a modest RSS, which is exactly what an idle-but-alive dev
+    # server looks like after the machine has been under pressure.
+    printf '\n%sholding the most swap%s\n' "$BOLD" "$RST"
+    # Collected into a variable rather than piped directly, because a pipeline
+    # runs its left side in a subshell, so a flag set inside the loop would be
+    # lost and the empty-case message would always fire.
+    local swap_rows=''
+    for d in /proc/[0-9]*; do
+        pid=${d#/proc/}
+        swap=$(awk '/^VmSwap:/{print $2}' "$d/status" 2>/dev/null)
+        [ -n "${swap:-}" ] && [ "$swap" -gt 0 ] 2>/dev/null || continue
+        swap_rows+="$swap	$pid	$(label_for "$pid")"$'\n'
+    done
+
+    if [ -n "$swap_rows" ]; then
+        printf '%s' "$swap_rows" | sort -rn | head -8 | awk -F'\t' '
+            { printf "  %7s MiB  pid %-8s %s\n", sprintf("%.0f", $1 / 1024), $2, $3 }
+        '
+    else
+        printf '  %snothing swapped out%s\n' "$DIM" "$RST"
+    fi
+
+    printf '\n%sr refresh    q quit%s\n' "$DIM" "$RST"
+}
+
+load_rules
+render
+while true; do
+    # -n1 so a single keypress acts; timeout auto-refreshes a window left open.
+    if read -rsn1 -t 30 key; then
+        case "$key" in
+            q|Q) exit 0 ;;
+            *)   render ;;
+        esac
+    else
+        render
+    fi
+done

@@ -9,7 +9,10 @@
         "clock"
     ],
     "modules-right": [
+        "memory",
+        "disk",
         "network",
+        "bluetooth",
         "pulseaudio",
         "battery",
         "tray"
@@ -25,11 +28,65 @@
         "format": "{:%a %b %d  %H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
+    "memory": {
+        // Swap percentage is on the bar next to the memory figure on purpose.
+        // Memory percentage on its own is a poor warning light: this machine
+        // has sat at 83% memory -- which reads as unremarkable -- while swap
+        // was 100% full, and it was the full swap that made it feel slow.
+        "interval": 5,
+        "format": "mem {used:0.1f}/{total:0.1f}G  swap {swapPercentage}%",
+        // States key off memory percentage only; waybar cannot drive a state
+        // from swapPercentage, so watch the swap number itself.
+        "states": {
+            "warning": 80,
+            "critical": 90
+        },
+        "tooltip-format": "{used:0.1f}G used / {total:0.1f}G total  ({avail:0.1f}G available)\nswap {swapUsed:0.1f}G / {swapTotal:0.1f}G  ({swapPercentage}%)\nclick: memory breakdown  •  right click: live process view",
+        // --hold keeps the window up if the script exits early, matching the
+        // disk module. The script itself waits on a keypress, so in normal use
+        // the window stays open and 'r' re-renders it in place.
+        "on-click": "foot --hold -T mem-breakdown ~/.local/bin/mem-breakdown",
+        "on-click-right": "foot -T mem-live sh -c 'top -o %MEM'"
+    },
+    "disk": {
+        // Root filesystem. {used}/{total} are pre-formatted with a unit suffix
+        // by waybar (e.g. "41.2G/466G"), so no unit conversion is needed here.
+        "path": "/",
+        "interval": 30,
+        "format": "disk {percentage_used}% {used}/{total}",
+        "states": {
+            "warning": 85,
+            "critical": 95
+        },
+        "tooltip-format": "{path}  {used} used / {total} total  ({free} free)\nclick: guided cleanup  •  right click: disk usage browser",
+        // Left click: interactive guided cleanup. Every action prompts,
+        // defaulting to no, so a stray click cannot delete anything.
+        // --hold keeps the foot window open if the script exits early.
+        "on-click": "foot --hold -T disk-cleanup ~/.local/bin/disk-cleanup",
+        "on-click-right": "foot -T disk-usage sh -c 'command -v ncdu >/dev/null && ncdu / || du -sh ~/* ~/.[!.]* 2>/dev/null | sort -rh | less'"
+    },
     "network": {
         "format-wifi": "net {essid} {signalStrength}%",
         "format-ethernet": "net {ipaddr}",
         "format-disconnected": "net off",
         "tooltip-format": "{ifname}: {ipaddr}"
+    },
+    "bluetooth": {
+        "format": "bt {status}",
+        "format-off": "bt off",
+        "format-disabled": "bt off",
+        "format-on": "bt on",
+        "format-connected": "bt {device_alias}",
+        "format-connected-battery": "bt {device_alias} {device_battery_percentage}%",
+        "tooltip-format": "{controller_alias}  {controller_address}\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}  {controller_address}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}  {device_address}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}  {device_address}  {device_battery_percentage}%",
+        // Left click: GUI manager. Right click: adapter settings.
+        // blueman is GTK3, so it follows ~/.config/gtk-3.0/gtk.css and the
+        // Alt+F5 / Alt+F6 day/night toggle along with the rest of the rice.
+        "on-click": "blueman-manager",
+        "on-click-right": "blueman-adapters"
     },
     "pulseaudio": {
         "format": "vol {volume}%",
@@ -37,7 +94,10 @@
         "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
     },
     "battery": {
-        "bat": "BAT1",
+        // Local deviation from the rice: the Surface enumerates its battery as
+        // BAT1, this HP EliteBook uses BAT0. With the wrong name waybar logs
+        // "No battery named BAT1" and silently renders nothing.
+        "bat": "BAT0",
         "states": {
             "warning": 30,
             "critical": 15

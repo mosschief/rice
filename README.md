@@ -11,7 +11,8 @@ Both compositors are configured to look and behave as identically as possible. T
 - `.config/sway/theme-day.sh` / `theme-night.sh` — Sway day/night theme toggle scripts
 - `.config/hypr/hyprland.conf` — Hyprland window manager (mirror of the Sway config)
 - `.config/hypr/theme-day.sh` / `theme-night.sh` — Hyprland day/night theme toggle scripts
-- `.config/waybar/` — status bar; `config.jsonc` (Sway) / `config-hypr.jsonc` (Hyprland), shared `style-day.css` / `style-night.css`
+- `.config/waybar/` — status bar; `config.jsonc` (Sway) / `config-hypr.jsonc` (Hyprland), shared `style-day.css` / `style-night.css` — see [Status bar](#status-bar)
+- `scripts/mem-breakdown` — memory breakdown viewer opened by the waybar memory module
 - `.config/foot/foot.ini` — terminal
 - `.config/hypr/hyprlock.conf` — lock screen (shared by both) — see [Lock screen](#lock-screen)
 - `.config/hypr/lock.sh` — wrapper that launches hyprlock, used by every lock trigger
@@ -149,6 +150,55 @@ A full logout/login is required after adding these for the portal to start corre
 sudo mkdir -p /usr/lib/firefox/distribution
 sudo cp etc/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
 ```
+
+## Status bar
+
+Only the Hyprland config (`config-hypr.jsonc`) carries the `memory` and `disk`
+modules; the Sway config is still the smaller original set.
+
+The memory module shows swap percentage next to the memory figure on purpose.
+Memory percentage alone is a poor warning light — the bar has read 83% while
+swap was 100% full, and it is the exhausted swap that makes the machine feel
+slow, because every allocation then has to reclaim pages first. Waybar's
+`states` can only key off memory percentage, so the swap number has to be
+visible in its own right.
+
+Left click opens `scripts/mem-breakdown` in a foot window (`r` refreshes, `q`
+quits); right click opens `top -o %MEM`. Install it with:
+
+```
+install -m 755 scripts/mem-breakdown ~/.local/bin/mem-breakdown
+```
+
+It leads with totals, swap and kernel pressure-stall figures, then groups usage
+**by app rather than by process**. Grouping reads `/proc/<pid>/cmdline` rather
+than the process name, because `comm` is truncated to 15 characters and renders
+node as `MainThread` and Firefox renderers as `Isolated Web Co` — which hides
+the common case of one app spread across twenty processes that each look small.
+RSS double-counts pages shared between processes, heavily so for
+Electron/Chromium families, so the grouped figures are a ranking and an upper
+bound rather than exact totals.
+
+Grouping rules are data, not code. With no rules file the label is the basename
+of `argv[0]`, which is correct for ordinary desktop apps. Anything
+machine-specific — work toolchains, multi-process dev servers, runtimes that
+all present as `node` — goes in a local file that is deliberately not part of
+this repository:
+
+```
+# ~/.config/rice/mem-groups
+# label <glob matched against the full cmdline> <fixed label>
+label   *some-toolchain*    some-toolchain
+# regex <glob> <sed expression run over the cmdline to derive the label>
+regex   */projects/*        s#^.*/projects/([^/ ]+)/.*$#project:\1#
+```
+
+First match wins, so order rules most-specific first. Override the path with
+`MEM_GROUPS_FILE` for testing.
+
+The disk module's left click runs `~/.local/bin/disk-cleanup`, a guided
+cleanup script that is not tracked here; the module degrades to doing nothing
+if it is absent.
 
 ## Key bindings
 

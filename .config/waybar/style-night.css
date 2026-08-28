@@ -41,7 +41,10 @@ window#waybar {
 }
 
 #clock,
+#memory,
+#disk,
 #network,
+#bluetooth,
 #pulseaudio,
 #battery,
 #tray {
@@ -72,4 +75,27 @@ window#waybar {
 
 #pulseaudio.muted {
     color: #88887e;
+}
+
+#bluetooth.off,
+#bluetooth.disabled {
+    color: #88887e;
+}
+
+#disk.warning {
+    color: #88887e;
+}
+
+#disk.critical {
+    color: #f2f1e5;
+    background: #2e2d26;
+}
+
+#memory.warning {
+    color: #88887e;
+}
+
+#memory.critical {
+    color: #f2f1e5;
+    background: #2e2d26;
 }
