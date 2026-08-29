@@ -304,7 +304,7 @@ The lock screen uses the night palette regardless of whether the desktop is in d
 | Field outline | `#deddd1` |
 | Asterisks and text | `#f2f1e5` |
 
-`rounding = 6` and `outline_thickness = 2` are the same values as `decoration:rounding` and `general:border_size` in `hyprland.conf`, so the field looks like the window borders around it. There is no placeholder text and no visible field until a key is pressed. Feedback is carried by the outline alone: it dims to `#2e2d26` while the password is checked and brightens to `#f2f1e5` when one is rejected, since the palette has no third colour to spend on it.
+`rounding = 0` and `outline_thickness = 2` are the same values as `decoration:rounding` and `general:border_size` in `hyprland.conf`, so the field looks like the window borders around it — square, as in sway. There is no placeholder text and no visible field until a key is pressed. Feedback is carried by the outline alone: it dims to `#2e2d26` while the password is checked and brightens to `#f2f1e5` when one is rejected, since the palette has no third colour to spend on it.
 
 The hiding is `fade_on_empty`. The field's alpha starts at 0, so it does not flash on screen and then fade out when the lock comes up. `fade_timeout` has to stay non-zero: at 0 the field hides the moment the buffer empties, and since a rejected password clears the buffer, the failure message — drawn with the same alpha — would vanish before it could be read.
 
