@@ -6,6 +6,7 @@ Both compositors are configured to look and behave as identically as possible. T
 
 ## Contents
 
+- `install.sh` — Linux installer; symlinks everything into place (see [Install](#install))
 - `mac/` — **macOS port** (yabai + skhd + Hammerspoon + sketchybar, SIP stays enabled) — see [mac/README.md](mac/README.md)
 - `.config/sway/config` — Sway window manager
 - `.config/sway/theme-day.sh` / `theme-night.sh` — Sway day/night theme toggle scripts
@@ -22,6 +23,34 @@ Both compositors are configured to look and behave as identically as possible. T
 - `.config/gtk-3.0/bookmarks` — Thunar sidebar bookmarks (SMB network shares)
 - `.config/gtk-3.0/gtk-day.css` / `gtk-night.css` — recoloured Adwaita for GTK apps (Thunar); `gtk.css` is the active copy
 
+## Install
+
+```
+git clone https://github.com/mosschief/rice ~/dotfiles
+~/dotfiles/install.sh
+```
+
+Idempotent — re-run it after a `git pull`, or to check a machine is still
+wired up correctly. It installs the pacman packages, symlinks every config
+into `~/.config`, builds the Papirus overlay themes, points Firefox at the
+repo's `user.js` and `chrome/`, writes the theme-switcher native messaging
+manifest, links the Obsidian snippet, and installs the LightDM greeter config
+— the only step needing sudo, and it is skipped when the file already matches.
+
+Configs are **symlinked, not copied**, so editing `~/.config/sway/config` edits
+the repo and `git status` tells the truth. An existing real file or directory
+is moved aside to `<name>.pre-rice` first, unless its contents already match,
+so running this on a machine that was set up by hand is safe.
+
+Three files are deliberately *not* symlinked: `waybar/style.css`,
+`foot/colors.ini`, and `gtk-3.0/gtk.css`. Those are the active copies the
+day/night toggle overwrites — linking them would make every toggle write
+through into the repo. `install.sh` seeds each from its `*-day` variant when
+missing and otherwise leaves it alone. They are gitignored for the same reason.
+
+What it cannot do — the font, and the handful of GUI toggles — it prints at the
+end. macOS has its own installer: [mac/install.sh](mac/install.sh).
+
 ## Guides
 
 - [Autodesk Fusion 360 on Arch + Sway](docs/autodesk-fusion-360.md) — running Fusion via Proton, with every non-obvious fix (startup abort, login, the black DXF dialog `Qt6WebEngineCore.dll` patch, and the Wine virtual-desktop fix for the sticky Browser panel).
@@ -29,15 +58,12 @@ Both compositors are configured to look and behave as identically as possible. T
 
 ## Dependencies
 
-```
-pacman -S sway waybar foot wmenu hyprlock swayidle playerctl \
-          xdg-desktop-portal xdg-desktop-portal-gtk
-```
-
-For the Hyprland session, additionally:
+`install.sh` installs these; the list is here for reference.
 
 ```
-pacman -S hyprland
+pacman -S sway hyprland waybar foot wmenu hyprlock swayidle playerctl \
+          xdg-desktop-portal xdg-desktop-portal-gtk \
+          papirus-icon-theme thunar gvfs gvfs-smb
 ```
 
 Hyprland reuses the same `swayidle` / `waybar` / `foot` / `wmenu` tools as Sway — no Hyprland-native equivalents needed. The solid background is painted natively by Hyprland (`misc:background_color`), so no wallpaper daemon is required.
@@ -71,7 +97,7 @@ the swaynag confirmation.
 
 ## Font
 
-[Iosevka Oui](https://williamjansson.com/files/rice/dots/fonts/TTF-Unhinted/) — download the TTFs and install:
+[Iosevka Oui](https://williamjansson.com/files/rice/dots/fonts/TTF-Unhinted/) — the one thing `install.sh` cannot do for you (it is not vendored here, and it checks for it at the end). Download the TTFs and install:
 
 ```
 mkdir -p ~/.local/share/fonts/IosevkaOui
@@ -129,14 +155,13 @@ scheme and drop out of the toggle scripts entirely.
 GTK apps use the stock **Adwaita** theme recoloured with the rice palette via
 `~/.config/gtk-3.0/gtk.css`. The toggle scripts copy `gtk-day.css` or
 `gtk-night.css` over `gtk.css` and force running GTK apps to reparse by briefly
-clearing and resetting `gtk-theme`. Set up on a new machine by copying the
-`.config/gtk-3.0/` files into place — no extra packages needed (Adwaita ships
-with GTK).
+clearing and resetting `gtk-theme`. `install.sh` links the `.config/gtk-3.0/`
+files into place — no extra packages needed (Adwaita ships with GTK).
 
 **Icons:** flat **Papirus** with grey folders to match the monochrome look.
 The folders come from a user-level overlay theme (`Papirus-Rice` /
 `Papirus-Rice-Dark`) that inherits Papirus and symlinks the grey folder variants
-— update-safe and no sudo. Set up on a new machine with:
+— update-safe and no sudo. Built by `install.sh`; standalone equivalent:
 
 ```
 sudo pacman -S papirus-icon-theme
@@ -148,7 +173,25 @@ The toggle switches `Papirus-Rice` (day) / `Papirus-Rice-Dark` (night) via
 
 ### Firefox setup
 
-Copy `.config/mozilla/firefox/user.js` to your Firefox profile directory (`~/.config/mozilla/firefox/<profile>/`) before first launch. This enables portal color scheme detection.
+`install.sh` resolves the default profile out of `profiles.ini` (under
+`~/.config/mozilla/firefox/`, falling back to `~/.mozilla/firefox/`) and links
+both `user.js` and `chrome/` into it. Do it before first launch on a fresh
+profile — Firefox only reads `user.js` at startup, and a profile has to exist
+before the installer can find it, so on a brand-new machine run Firefox once
+and then re-run `install.sh`.
+
+`user.js` carries three prefs: portal color-scheme detection, unsigned-extension
+loading for the theme extension, and `toolkit.legacyUserProfileCustomizations.
+stylesheets` — without that last one Firefox ignores the whole `chrome/`
+directory and `userChrome.css` silently does nothing.
+
+The live theme switching goes through a WebExtension in
+`.config/sway/firefox-theme-ext/` talking to `.config/sway/theme-host.py` over
+native messaging. `install.sh` generates the host manifest at
+`~/.mozilla/native-messaging-hosts/theme_switcher.json` (it holds an absolute
+path, so it is generated rather than checked in). The extension itself is
+unsigned and has to be loaded by hand: about:debugging → This Firefox → Load
+Temporary Add-on → `manifest.json`.
 
 ### xdg-desktop-portal setup
 
@@ -163,10 +206,15 @@ A full logout/login is required after adding these for the portal to start corre
 
 ## LightDM greeter
 
+Installed by `install.sh` (the only step that needs sudo, and it is skipped
+when the file already matches). Standalone equivalent:
+
 ```
-sudo mkdir -p /usr/lib/firefox/distribution
-sudo cp etc/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
+sudo install -Dm 644 etc/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
 ```
+
+The greeter uses Iosevka Oui, so the font has to be installed system-wide as
+well as in `~/.local/share/fonts` — see [Font](#font).
 
 ## Status bar
 
@@ -181,7 +229,8 @@ slow, because every allocation then has to reclaim pages first. Waybar's
 visible in its own right.
 
 Left click opens `scripts/mem-breakdown` in a foot window (`r` refreshes, `q`
-quits); right click opens `top -o %MEM`. Install it with:
+quits); right click opens `top -o %MEM`. `install.sh` links it into
+`~/.local/bin`; standalone equivalent:
 
 ```
 install -m 755 scripts/mem-breakdown ~/.local/bin/mem-breakdown
@@ -231,7 +280,7 @@ if it is absent.
 
 ## Obsidian
 
-Copy `Obsidian Vault/.obsidian/snippets/rice.css` to your vault's `.obsidian/snippets/` directory, then enable it in Settings → Appearance → CSS snippets. Uses the same three-color palette as the rest of the desktop and follows the system dark/light mode.
+`install.sh` links `Obsidian Vault/.obsidian/snippets/rice.css` into `~/Obsidian Vault/.obsidian/snippets/` when that vault exists; otherwise copy it to your vault's `.obsidian/snippets/` by hand. Either way you then enable it in Settings → Appearance → CSS snippets. Uses the same three-color palette as the rest of the desktop and follows the system dark/light mode.
 
 ## Lock screen
 

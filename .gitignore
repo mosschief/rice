@@ -1,0 +1,8 @@
+# Active copies written by the day/night toggle scripts, seeded by install.sh
+# from their *-day variants. Theme state, not configuration.
+.config/waybar/style.css
+.config/foot/colors.ini
+.config/gtk-3.0/gtk.css
+
+# Backups install.sh makes when it replaces a hand-placed file
+*.pre-rice
