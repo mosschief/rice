@@ -13,7 +13,8 @@ Both compositors are configured to look and behave as identically as possible. T
 - `.config/hypr/theme-day.sh` / `theme-night.sh` — Hyprland day/night theme toggle scripts
 - `.config/waybar/` — status bar; `config.jsonc` (Sway) / `config-hypr.jsonc` (Hyprland), shared `style-day.css` / `style-night.css` — see [Status bar](#status-bar)
 - `scripts/mem-breakdown` — memory breakdown viewer opened by the waybar memory module
-- `.config/foot/foot.ini` — terminal
+- `.config/foot/foot.ini` — terminal; hand-owned (font, and anything else you set)
+- `.config/foot/colors-day.ini` / `colors-night.ini` — terminal colours; `colors.ini` is the active copy, pulled in by `foot.ini` via `include=`
 - `.config/hypr/hyprlock.conf` — lock screen (shared by both) — see [Lock screen](#lock-screen)
 - `.config/hypr/lock.sh` — wrapper that launches hyprlock, used by every lock trigger
 - `.config/mozilla/firefox/user.js` — Firefox portal theme settings
@@ -106,6 +107,22 @@ Night mode inverts to a warm dark palette (`#1c1b16` / `#2e2d26` / `#f2f1e5`).
 Switches live: sway window colors, waybar, foot terminals, Firefox, and any app that respects `prefers-color-scheme` (e.g. Obsidian).
 
 Works via `gsettings set org.gnome.desktop.interface color-scheme` → `xdg-desktop-portal-gtk` → all GTK/Electron apps.
+
+### foot
+
+The toggle scripts do **not** write `foot.ini`. They only copy `colors-day.ini` or
+`colors-night.ini` over `colors.ini`, which `foot.ini` pulls in with `include=`.
+Keep anything hand-set — the font size in particular — in `foot.ini`; only the
+`[colors]` block belongs in the variant files.
+
+Earlier the scripts rewrote the whole of `foot.ini` from a heredoc with the font
+size baked in, so every toggle silently reverted it.
+
+Note that foot's `cursor=` takes **two** colours (the text under the cursor, then
+the cursor itself); a single value is rejected outright by foot 1.27+. `[colors]`
+is also deprecated in favour of `[colors-dark]` / `[colors-light]`, which foot
+switches between on its own — adopting those would let foot follow the system
+scheme and drop out of the toggle scripts entirely.
 
 ### GTK apps (Thunar, file dialogs)
 

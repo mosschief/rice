@@ -8,34 +8,9 @@ hyprctl keyword general:col.inactive_border 'rgb(deddd1)'
 cp ~/.config/waybar/style-day.css ~/.config/waybar/style.css
 pkill -SIGUSR2 waybar
 
-cat > ~/.config/foot/foot.ini << 'EOF'
-[main]
-font=Iosevka Oui:size=9
-
-[colors]
-alpha=0.95
-background=f2f1e5
-foreground=000000
-cursor=000000
-selection-foreground=f2f1e5
-selection-background=000000
-regular0=deddd1
-regular1=444444
-regular2=444444
-regular3=444444
-regular4=444444
-regular5=444444
-regular6=444444
-regular7=000000
-bright0=c8c7bb
-bright1=222222
-bright2=222222
-bright3=222222
-bright4=222222
-bright5=222222
-bright6=222222
-bright7=000000
-EOF
+# Colours only — foot.ini itself is hand-owned and must not be rewritten here,
+# or the font size set in it is lost on every toggle.
+cp ~/.config/foot/colors-day.ini ~/.config/foot/colors.ini
 
 # System color scheme + Firefox live theme
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
