@@ -55,6 +55,7 @@ end. macOS has its own installer: [mac/install.sh](mac/install.sh).
 
 - [Autodesk Fusion 360 on Arch + Sway](docs/autodesk-fusion-360.md) — running Fusion via Proton, with every non-obvious fix (startup abort, login, the black DXF dialog `Qt6WebEngineCore.dll` patch, and the Wine virtual-desktop fix for the sticky Browser panel).
 - [Network drives (SMB) in Thunar](docs/network-drives-smb.md) — browsing/mounting the Unraid SMB shares: the required `gvfs-smb` backend, avahi/mDNS discovery, `.local` resolution, and sidebar bookmarks.
+- [Better shell history search (atuin)](docs/shell-history-atuin.md) — fuzzy full-text `Ctrl+R` backed by a SQLite database, per-directory history filtering, and the bash history-size settings that stop old commands being clobbered.
 
 ## Dependencies
 
