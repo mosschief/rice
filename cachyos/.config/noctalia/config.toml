@@ -4,7 +4,7 @@ ui_scale = 1.20
 [bar.default]
 center = [ "workspaces", "spacer_1", "active_window" ]
 concave_edge_corners = false
-end = [ "media", "spacer_1", "tray", "notifications", "network", "volume", "session" ]
+end = [ "media", "spacer_1", "tray", "notifications", "network", "volume", "battery", "session" ]
 margin_edge = 0
 margin_ends = 0
 radius_bottom_left = 0
@@ -95,6 +95,11 @@ wallpaper_scheme = "m3-tonal-spot"
 
     [theme.templates]
     builtin_ids = [ "btop", "gtk3", "gtk4", "kcolorscheme", "kitty", "qt", "alacritty" ]
+
+[widget.battery]
+color = "secondary"
+show_label = true
+label_content = "percent"
 
 [widget.clock]
 color = "secondary"
