@@ -7,6 +7,7 @@ Both compositors are configured to look and behave as identically as possible. T
 ## Contents
 
 - `install.sh` — Linux installer; symlinks everything into place (see [Install](#install))
+- `cachyos/` — **CachyOS variant** (stock CachyOS Hyprland + Noctalia shell + kitty, restyled and rebound to match) — see [cachyos/README.md](cachyos/README.md)
 - `mac/` — **macOS port** (yabai + skhd + Hammerspoon + sketchybar, SIP stays enabled) — see [mac/README.md](mac/README.md)
 - `.config/sway/config` — Sway window manager
 - `.config/sway/theme-day.sh` / `theme-night.sh` — Sway day/night theme toggle scripts
