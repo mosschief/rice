@@ -11,11 +11,7 @@ hl.config({
             disable_while_typing = true,
         },
     },
-    -- Software cursors: the hardware cursor plane on the Panther Lake iGPU made the
-    -- cursor intermittently vanish or render at the wrong size
-    cursor = {
-        no_hardware_cursors = 1,
-    },
+    -- (no_hardware_cursors is a Framework-only quirk: config/hosts/framework.lua)
 })
 
 hl.gesture({ fingers = 4, direction = "horizontal", action = "workspace" })

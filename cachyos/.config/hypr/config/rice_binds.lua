@@ -3,7 +3,7 @@
 -- Noctalia panels, screenshots, zoom, etc. Hardware/media keys are in binds.lua.
 
 local mod = "ALT"
-local launchPrefix = "uwsm app -- "
+local launchPrefix = LAUNCH_PREFIX -- config/variables.lua
 local hypr = os.getenv("HOME") .. "/.config/hypr/"
 
 local left, down, up, right = "J", "K", "L", "semicolon"
@@ -95,5 +95,4 @@ hl.define_submap("resize", function()
     hl.bind("Escape", hl.dsp.submap("reset"))
 end)
 
--- Lid close -> lock (no fade) then suspend
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd(hypr .. "lock.sh --now; systemctl suspend"), { locked = true })
+-- The lid switch is per machine: config/hosts/*.lua

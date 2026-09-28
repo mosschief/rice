@@ -8,7 +8,7 @@ Both compositors are configured to look and behave as identically as possible. T
 
 - `install.sh` — Linux installer; symlinks everything into place (see [Install](#install))
 - `cachyos/` — **CachyOS variant** (stock CachyOS Hyprland + Noctalia shell + kitty, restyled and rebound to match) — see [cachyos/README.md](cachyos/README.md)
-- `ubuntu/` — **Ubuntu variant** (the CachyOS variant on Ubuntu 24.04 with a source-built Hyprland 0.52, upstream kitty, and `hyprland.conf` instead of Lua) — see [ubuntu/README.md](ubuntu/README.md)
+- `ubuntu/` — **Ubuntu variant** (the same Hyprland config as CachyOS on Ubuntu 24.04, with Hyprland 0.56 built from source) — see [ubuntu/README.md](ubuntu/README.md)
 - `mac/` — **macOS port** (yabai + skhd + Hammerspoon + sketchybar, SIP stays enabled) — see [mac/README.md](mac/README.md)
 - `.config/sway/config` — Sway window manager
 - `.config/sway/theme-day.sh` / `theme-night.sh` — Sway day/night theme toggle scripts

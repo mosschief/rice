@@ -1,6 +1,6 @@
 local mainMod = "SUPER"
 local noctCall = "noctalia msg "
-local launchPrefix = "uwsm app -- " -- if you are not using UWSM, make this empty (e.g. "")
+local launchPrefix = LAUNCH_PREFIX -- config/variables.lua: uwsm where available
 
 -- AZERTY fix: the number-row keys emit symbols (& é " ' ...) without Shift, so
 -- binding to the digit characters fails. Bind by physical keycode instead.

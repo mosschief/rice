@@ -1,23 +1,26 @@
 #!/usr/bin/env bash
-# Installer for the Ubuntu variant of the rice: the CachyOS variant (Noctalia
-# shell, rice palette and ALT keymap layered over CachyOS's SUPER bindings) on
-# Ubuntu 24.04 with Hyprland 0.52 built from source into ~/.local/hypr.
-# Idempotent — safe to re-run.
+# Installer for the Ubuntu variant of the rice: the CachyOS variant on Ubuntu
+# 24.04, with Hyprland 0.56, Noctalia and wireplumber 0.5 built from source into
+# ~/.local/hypr-0.56. Idempotent — safe to re-run.
+#
+# The Hyprland config is the CachyOS one, linked straight from ../cachyos:
+# config/host.lua picks config/hosts/elitebook.lua on this machine. Only the
+# Noctalia config (screenshots) and the 0.52 fallback hyprland.conf live in
+# this directory.
 #
 # Same conventions as ../install.sh: configs are SYMLINKED into ~/.config so
 # edits land in the repo, and an existing file that differs is moved aside to
-# <name>.pre-rice first. Files shared with the CachyOS variant (palette,
-# wallpapers, lock.sh, theme-day/night.sh) are linked from ../cachyos directly.
+# <name>.pre-rice first.
 #
-# Nothing here needs root. Hyprland, wireplumber 0.5 and Noctalia are built by
-# ~/hypr-build/build.sh; this script only checks that they are there.
+# Nothing here needs root. The compositor and shell are built by
+# ~/hypr-build/build-gcc.sh then ~/hypr-build/build.sh; this only checks them.
 
 set -euo pipefail
 
 VARIANT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$VARIANT_DIR")"
 CACHY_DIR="$REPO_DIR/cachyos"
-PREFIX="${HYPR_PREFIX:-$HOME/.local/hypr}"
+PREFIX="${HYPR_PREFIX:-$HOME/.local/hypr-0.56}"
 
 link() {
     local src="$1" dst="$2"
@@ -50,7 +53,8 @@ for b in jq gsettings; do
 done
 if [ "$missing" -eq 1 ]; then
     cat <<'EOF'
-  ! Build the compositor and shell first:  ~/hypr-build/build.sh
+  ! Build the compositor and shell first:
+      ~/hypr-build/build-gcc.sh && ~/hypr-build/build.sh
     (Noctalia's apt build-dependencies are listed in ubuntu/README.md.)
 EOF
 fi
@@ -87,19 +91,18 @@ sed -e "s|Icon=kitty|Icon=$HOME/.local/kitty.app/share/icons/hicolor/256x256/app
 
 echo "==> symlinking configs"
 H="$HOME/.config/hypr"
-link "$VARIANT_DIR/.config/hypr/hyprland.conf"   "$H/hyprland.conf"
-link "$VARIANT_DIR/.config/hypr/theme.sh"        "$H/theme.sh"
-link "$CACHY_DIR/.config/hypr/lock.sh"           "$H/lock.sh"
-link "$CACHY_DIR/.config/hypr/theme-day.sh"      "$H/theme-day.sh"
-link "$CACHY_DIR/.config/hypr/theme-night.sh"    "$H/theme-night.sh"
+# The same files cachyos/install.sh links, from the same place.
+for f in hyprland.lua xdph.conf lock.sh theme.sh theme-day.sh theme-night.sh config; do
+    link "$CACHY_DIR/.config/hypr/$f" "$H/$f"
+done
+# Only read by the Hyprland 0.52 fallback session (0.56 prefers hyprland.lua).
+link "$VARIANT_DIR/.config/hypr/hyprland.conf" "$H/hyprland.conf"
 
 link "$VARIANT_DIR/.config/noctalia/config.toml"     "$HOME/.config/noctalia/config.toml"
 link "$CACHY_DIR/.config/noctalia/palettes/rice.json" "$HOME/.config/noctalia/palettes/rice.json"
 # Same kitty.conf as CachyOS. Noctalia's kitty template only appends its include
 # line when missing, and writes through the link, so linking is safe.
 link "$CACHY_DIR/.config/kitty/kitty.conf"           "$HOME/.config/kitty/kitty.conf"
-# foot is kept as a fallback terminal, still themed by Noctalia.
-link "$VARIANT_DIR/.config/foot/foot.ini"            "$HOME/.config/foot/foot.ini"
 
 link "$CACHY_DIR/wallpapers/rice-day.png"   "$HOME/.local/share/wallpapers/rice-day.png"
 link "$CACHY_DIR/wallpapers/rice-night.png" "$HOME/.local/share/wallpapers/rice-night.png"
@@ -137,8 +140,7 @@ fi
 
 # ------------------------------------------------------------------- theme ---
 
-# Seeds ~/.local/state/rice-theme.conf, which hyprland.conf sources; keeps the
-# current mode if one was already chosen.
+# Re-applies the current mode (default day) so every themed app agrees.
 state="${XDG_STATE_HOME:-$HOME/.local/state}"
 mode="$(cat "$state/rice-theme" 2>/dev/null || echo day)"
 echo "==> applying the $mode theme"
@@ -146,7 +148,7 @@ echo "==> applying the $mode theme"
 
 cat <<'EOF'
 
-Done. Log out and back in to "Hyprland (local build)" to start Noctalia in
-place of waybar/swayidle/hyprlock (or, in a running session: pkill waybar;
-pkill swayidle; hyprctl reload; hyprctl dispatch exec noctalia).
+Done. Log out and back in ("Hyprland" at the GDM login screen) to start
+Hyprland 0.56 with the shared Lua config. To go back to the 0.52 build:
+  echo ~/.local/hypr > ~/.config/hypr/session-prefix   (undo: rm that file)
 EOF

@@ -94,22 +94,32 @@ the same.
 
 ## Hardware-specific bits
 
-These are for the Framework 13 Pro and the two ASUS monitors; change them on
-other machines.
+This config is shared with the [Ubuntu laptop](../ubuntu/README.md).
+`config/host.lua` reads the DMI vendor and loads one file from `config/hosts/`
+(`framework.lua` here, `elitebook.lua` there; anything unknown gets
+`framework.lua`). Per-machine settings go in those files, not in the shared
+ones. `LAUNCH_PREFIX` in `config/variables.lua` is `uwsm app -- ` only where
+`/usr/bin/uwsm` exists.
 
-- **Monitors** — `config/monitors.lua` / `config/variables.lua`: laptop panel
-  (2880x1920 at scale 2, so 1440 logical px wide) on the left, then the
-  PA278CV at `1440x0` and the daisy-chained PA278CGV at `4000x0`. The ASUS
-  panels are matched by `desc:` for the same reason as in the main config —
-  MST renumbers the DP connectors.
+`config/hosts/framework.lua` covers the Framework 13 Pro and the two ASUS
+monitors:
+
+- **Monitors** — laptop panel (2880x1920 at scale 2, so 1440 logical px wide)
+  on the left, then the PA278CV at `1440x0` and the daisy-chained PA278CGV at
+  `4000x0`. The ASUS panels are matched by `desc:` for the same reason as in
+  the main config — MST renumbers the DP connectors.
+- **Cursor** — `no_hardware_cursors = 1`: the Panther Lake iGPU's hardware
+  cursor plane made the cursor vanish or render at the wrong size.
+- **Lid switch** — lock (no fade), then suspend.
+
+Two Framework quirks stay in the shared binds because they are harmless
+elsewhere:
+
 - **F5 / F6** — the Framework's top row sends media keys unless Fn is held
   (F5 = `XF86AudioPlay`, F6 = `XF86AudioNext`), so the theme toggle is bound to
   `Alt+` both those and the real F-keys.
 - **Keyboard backlight** — `XF86KbdBrightnessUp/Down` and `XF86KbdLightOnOff`
   go to Noctalia (the backlight is `chromeos::kbd_backlight` via `cros_ec`).
-- **Cursor** — `no_hardware_cursors = 1` in `config/inputs.lua`: the Panther
-  Lake iGPU's hardware cursor plane made the cursor vanish or render at the
-  wrong size.
 
 ## Lock screen
 
@@ -118,7 +128,7 @@ before sleep (via a logind inhibitor), so a second ext-session-lock client
 races it — with hyprlock in the mix the bar was left frozen after unlock.
 `lock.sh` therefore just calls `noctalia msg session lock`; it is kept as the
 single entry point so the keybinds and lid switch have one thing to call, and
-still accepts `--now` for the lid path. Idle is Noctalia's too (`[idle]` in
+still accepts `--now` for the lid path (`config/hosts/framework.lua`). Idle is Noctalia's too (`[idle]` in
 `config.toml`): lock after 5 minutes, screens off after 10.
 
 ## Firefox fullscreen

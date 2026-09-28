@@ -1,3 +1,5 @@
+# Ubuntu copy of cachyos/.config/noctalia/config.toml. The only difference is
+# screenshots (no swash on Ubuntu). Keep every other change in both files.
 [accessibility]
 ui_scale = 1.20
 
@@ -30,11 +32,7 @@ thickness = 35
 font_family = "Iosevka Oui"
 corner_radius_scale = 0.0
 popup_shadows = false
-# Ubuntu: plain fork/exec, like Hyprland's exec. Only WAYLAND_DISPLAY and
-# XDG_CURRENT_DESKTOP are imported into the systemd user manager here (the
-# session's LD_LIBRARY_PATH must not leak into it), so apps started as
-# systemd units would miss the session PATH.
-launch_apps_as_systemd_services = false
+launch_apps_as_systemd_services = true
 polkit_agent = true
 settings_show_advanced = true
 
@@ -47,7 +45,8 @@ settings_show_advanced = true
     session_placement = "floating"
     session_position = "center"
 
-    # Ubuntu: no swash, so copy to the clipboard and save a file instead.
+    # Ubuntu: swash (the CachyOS screenshot editor) is not packaged, so copy
+    # to the clipboard and save a file instead.
     [shell.screenshot]
     copy_to_clipboard = true
     pipe_to_command = false
@@ -97,8 +96,7 @@ source = "wallpaper"
 wallpaper_scheme = "m3-tonal-spot"
 
     [theme.templates]
-    # Ubuntu: no KDE/Qt apps on this machine. foot stays themed as a fallback.
-    builtin_ids = [ "btop", "gtk3", "gtk4", "kitty", "foot" ]
+    builtin_ids = [ "btop", "gtk3", "gtk4", "kcolorscheme", "kitty", "qt", "alacritty" ]
 
 [widget.battery]
 color = "secondary"
