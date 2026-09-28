@@ -26,7 +26,7 @@ Then log out and back in to "Hyprland (local build)".
 | Hyprland config | Lua (`hyprland.lua` + `config/*.lua`) | `hyprland.conf`: Hyprland 0.52 predates Lua config |
 | Terminal | kitty | kitty too, but the upstream 0.49.1 build in `~/.local/kitty.app` (noble's 0.32 has no `cursor_trail`); foot stays as a Noctalia-themed fallback |
 | Border colours | `config/theme.lua` reads `~/.local/state/rice-theme` | `theme.sh` writes `~/.local/state/rice-theme.conf`, sourced last by `hyprland.conf` |
-| Animations | springs | beziers only (0.52 has no springs) |
+| Animations | `easy` spring for windows | same leaves and speeds; the spring is a bezier fitted to its step response (0.52 has no springs) |
 | Monitors | Framework + ASUS | this laptop's panel, the ASUS pair at home, the Dell pair at work |
 | Screenshots | piped to swash | clipboard + file |
 | Templates | kitty, alacritty, Qt/KDE, GTK, btop | kitty, foot, GTK, btop |
