@@ -169,7 +169,7 @@ fi
 # ------------------------------------------------------------------- fonts ---
 
 echo "==> fonts"
-if fc-list | grep -qi "Iosevka Oui"; then
+if fc-list | grep -i "Iosevka Oui" >/dev/null; then  # not -q: it closes the pipe early and pipefail trips on fc-list's SIGPIPE
     echo "  Iosevka Oui present"
 else
     echo "  ! Iosevka Oui not installed — see README (Font); it is not vendored here"

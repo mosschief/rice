@@ -24,12 +24,12 @@ Then log out and back in to "Hyprland (local build)".
 | | CachyOS | Ubuntu |
 |---|---|---|
 | Hyprland config | Lua (`hyprland.lua` + `config/*.lua`) | `hyprland.conf`: Hyprland 0.52 predates Lua config |
-| Terminal | kitty | foot (noble's kitty 0.32 has no `cursor_trail`); themed by Noctalia's foot template |
+| Terminal | kitty | kitty too, but the upstream 0.49.1 build in `~/.local/kitty.app` (noble's 0.32 has no `cursor_trail`); foot stays as a Noctalia-themed fallback |
 | Border colours | `config/theme.lua` reads `~/.local/state/rice-theme` | `theme.sh` writes `~/.local/state/rice-theme.conf`, sourced last by `hyprland.conf` |
 | Animations | springs | beziers only (0.52 has no springs) |
 | Monitors | Framework + ASUS | this laptop's panel, the ASUS pair at home, the Dell pair at work |
 | Screenshots | piped to swash | clipboard + file |
-| Templates | kitty, alacritty, Qt/KDE, GTK, btop | foot, GTK, btop |
+| Templates | kitty, alacritty, Qt/KDE, GTK, btop | kitty, foot, GTK, btop |
 | Activation env | `dbus-update-activation-environment --all` | only `WAYLAND_DISPLAY` / `XDG_CURRENT_DESKTOP`, so the session's `LD_LIBRARY_PATH` for `~/.local/hypr/lib` does not leak into systemd services |
 | Lid switch | bound in Hyprland | left to logind; Noctalia's sleep inhibitor locks first |
 

@@ -97,8 +97,8 @@ source = "wallpaper"
 wallpaper_scheme = "m3-tonal-spot"
 
     [theme.templates]
-    # Ubuntu: foot is the terminal; no KDE/Qt apps on this machine.
-    builtin_ids = [ "btop", "gtk3", "gtk4", "foot" ]
+    # Ubuntu: no KDE/Qt apps on this machine. foot stays themed as a fallback.
+    builtin_ids = [ "btop", "gtk3", "gtk4", "kitty", "foot" ]
 
 [widget.battery]
 color = "secondary"

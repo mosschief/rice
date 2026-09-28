@@ -113,7 +113,7 @@ echo "  wrote:  ~/.mozilla/native-messaging-hosts/theme_switcher.json"
 echo "==> fonts"
 FONT_DIR="$HOME/.local/share/fonts/IosevkaOui"
 FONT_URL="https://williamjansson.com/files/rice/dots/fonts/TTF-Unhinted"
-if fc-list | grep -qi "Iosevka Oui"; then
+if fc-list | grep -i "Iosevka Oui" >/dev/null; then  # not -q: it closes the pipe early and pipefail trips on fc-list's SIGPIPE
     echo "  Iosevka Oui present"
 else
     mkdir -p "$FONT_DIR"

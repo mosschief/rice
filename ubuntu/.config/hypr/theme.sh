@@ -1,9 +1,10 @@
 #!/bin/sh
 # Rice day/night toggle, Ubuntu variant: cachyos/.config/hypr/theme.sh adapted
-# for Hyprland 0.52 (hyprland.conf, no Lua) and foot. Usage: theme.sh day|night
+# for Hyprland 0.52 (hyprland.conf, no Lua). Usage: theme.sh day|night
 #
 # Noctalia's "rice" palette (~/.config/noctalia/palettes/rice.json) themes the
-# bar, foot, GTK 3/4 and btop; switching its mode re-renders those templates.
+# bar, kitty, GTK 3/4 and btop; switching its mode re-renders those templates
+# and reloads running kitty windows.
 # Hyprland takes its colours from ~/.local/state/rice-theme.conf, which is
 # written here and sourced at the end of hyprland.conf so a reload keeps them.
 set -u
@@ -50,7 +51,7 @@ if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
     hyprctl reload >/dev/null
 fi
 
-# Shell, bar, foot, GTK via Noctalia
+# Shell, bar, kitty, GTK via Noctalia
 if pgrep -x noctalia >/dev/null; then
     if [ "$(noctalia msg color-scheme-get 2>/dev/null)" != "custom rice" ]; then
         noctalia msg color-scheme-set custom rice
@@ -75,25 +76,3 @@ echo "$mode" > "$HOME/.config/sway/current-theme"
 if [ -f "$HOME/.claude/settings.json" ]; then
     sed -i -E "s/\"theme\": \"(light|dark|auto)\"/\"theme\": \"$mode\"/" "$HOME/.claude/settings.json"
 fi
-
-# Running foot terminals: Noctalia's foot template only affects new windows,
-# so recolour the open ones over OSC with the same palette values.
-if [ "$1" = day ]; then
-    fg=000000; tbg=f2f1e5; c0=deddd1; cn=444444; c8=c8c7bb; cb=222222; c7=000000
-else
-    fg=f2f1e5; tbg=1c1b16; c0=2e2d26; cn=bbbbaf; c8=3e3d34; cb=ddddd1; c7=f2f1e5
-fi
-apply_term_colors() {
-    printf '\033]10;#%s\007\033]11;#%s\007\033]12;#%s\007' "$fg" "$tbg" "$fg"
-    printf '\033]4;0;#%s\007' "$c0"
-    for i in 1 2 3 4 5 6; do printf '\033]4;%d;#%s\007' "$i" "$cn"; done
-    printf '\033]4;7;#%s\007\033]4;8;#%s\007' "$c7" "$c8"
-    for i in 9 10 11 12 13 14; do printf '\033]4;%d;#%s\007' "$i" "$cb"; done
-    printf '\033]4;15;#%s\007' "$c7"
-}
-for pid in $(pgrep -x foot); do
-    for child in $(pgrep -P "$pid"); do
-        tty=$(readlink /proc/"$child"/fd/0 2>/dev/null)
-        case "$tty" in /dev/pts/*) apply_term_colors > "$tty" ;; esac
-    done
-done

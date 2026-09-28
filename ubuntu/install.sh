@@ -45,7 +45,7 @@ for b in Hyprland hyprctl noctalia; do
         echo "  MISSING: $PREFIX/bin/$b"; missing=1
     fi
 done
-for b in foot jq gsettings; do
+for b in jq gsettings; do
     command -v "$b" >/dev/null && echo "  ok:      $b" || { echo "  MISSING: $b"; missing=1; }
 done
 if [ "$missing" -eq 1 ]; then
@@ -54,6 +54,34 @@ if [ "$missing" -eq 1 ]; then
     (Noctalia's apt build-dependencies are listed in ubuntu/README.md.)
 EOF
 fi
+
+# ------------------------------------------------------------------- kitty ---
+
+# Upstream prebuilt kitty in ~/.local/kitty.app: noble's apt kitty is 0.32,
+# which predates cursor_trail (0.37). Pinned, and checked against the digest
+# GitHub publishes for the release asset.
+KITTY_VERSION=0.49.1
+KITTY_SHA256=8cfd68ed484d9a32e4e389abffe1a0ec6e0fbd7be5c9ea1c4fa41b9ead4af791
+echo "==> kitty"
+if [ "$("$HOME/.local/kitty.app/bin/kitty" --version 2>/dev/null | awk '{print $2}')" = "$KITTY_VERSION" ]; then
+    echo "  kitty $KITTY_VERSION present"
+else
+    tmp="$(mktemp -d)"
+    curl -fsSL -o "$tmp/kitty.txz" \
+        "https://github.com/kovidgoyal/kitty/releases/download/v$KITTY_VERSION/kitty-$KITTY_VERSION-x86_64.txz"
+    echo "$KITTY_SHA256  $tmp/kitty.txz" | sha256sum -c --quiet
+    rm -rf "$HOME/.local/kitty.app" && mkdir -p "$HOME/.local/kitty.app"
+    tar -xJf "$tmp/kitty.txz" -C "$HOME/.local/kitty.app"
+    rm -rf "$tmp"
+    echo "  installed: ~/.local/kitty.app (kitty $KITTY_VERSION)"
+fi
+mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications"
+ln -sfn "$HOME/.local/kitty.app/bin/kitty"  "$HOME/.local/bin/kitty"
+ln -sfn "$HOME/.local/kitty.app/bin/kitten" "$HOME/.local/bin/kitten"
+sed -e "s|Icon=kitty|Icon=$HOME/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|" \
+    -e "s|Exec=kitty|Exec=$HOME/.local/kitty.app/bin/kitty|" \
+    "$HOME/.local/kitty.app/share/applications/kitty.desktop" \
+    > "$HOME/.local/share/applications/kitty.desktop"
 
 # ------------------------------------------------------------------ configs ---
 
@@ -67,7 +95,10 @@ link "$CACHY_DIR/.config/hypr/theme-night.sh"    "$H/theme-night.sh"
 
 link "$VARIANT_DIR/.config/noctalia/config.toml"     "$HOME/.config/noctalia/config.toml"
 link "$CACHY_DIR/.config/noctalia/palettes/rice.json" "$HOME/.config/noctalia/palettes/rice.json"
-# Noctalia's foot template leaves foot.ini alone once it has the include line.
+# Same kitty.conf as CachyOS. Noctalia's kitty template only appends its include
+# line when missing, and writes through the link, so linking is safe.
+link "$CACHY_DIR/.config/kitty/kitty.conf"           "$HOME/.config/kitty/kitty.conf"
+# foot is kept as a fallback terminal, still themed by Noctalia.
 link "$VARIANT_DIR/.config/foot/foot.ini"            "$HOME/.config/foot/foot.ini"
 
 link "$CACHY_DIR/wallpapers/rice-day.png"   "$HOME/.local/share/wallpapers/rice-day.png"
@@ -93,7 +124,7 @@ fi
 echo "==> fonts"
 FONT_DIR="$HOME/.local/share/fonts/IosevkaOui"
 FONT_URL="https://williamjansson.com/files/rice/dots/fonts/TTF-Unhinted"
-if fc-list | grep -qi "Iosevka Oui"; then
+if fc-list | grep -i "Iosevka Oui" >/dev/null; then  # not -q: it closes the pipe early and pipefail trips on fc-list's SIGPIPE
     echo "  Iosevka Oui present"
 else
     mkdir -p "$FONT_DIR"
