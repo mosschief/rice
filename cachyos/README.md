@@ -18,8 +18,8 @@ git clone https://github.com/mosschief/rice ~/dotfiles
 
 Same conventions as the top-level [install.sh](../install.sh): configs are
 symlinked into `~/.config`, anything in the way is moved to `<name>.pre-rice`,
-and it is safe to re-run. It also downloads Iosevka Oui into
-`~/.local/share/fonts/IosevkaOui` if it is missing. Noctalia only reads the font
+and it is safe to re-run. It also downloads Nordwand Mono into
+`~/.local/share/fonts/NordwandMono` if it is missing. Noctalia only reads the font
 list at startup, so restart it after a first install (`pkill -x noctalia`, then
 `noctalia` from a Hyprland exec or re-login).
 
@@ -27,8 +27,8 @@ list at startup, so restart it after a first install (`pkill -x noctalia`, then
 
 | | CachyOS default (kept) | From the rice |
 |---|---|---|
-| Status bar | Noctalia, same widgets | Rice palette, square corners, no shadows, workspace numbers, 1px bottom rule, Iosevka Oui |
-| Terminal | kitty, cursor trail | Rice palette (via Noctalia's kitty template), 0.95 opacity, no padding, Iosevka Oui 10 |
+| Status bar | Noctalia, same widgets | Rice palette, square corners, no shadows, workspace numbers, 1px bottom rule, Nordwand Mono |
+| Terminal | kitty, cursor trail | Rice palette (via Noctalia's kitty template), 0.95 opacity, no padding, Nordwand Mono 10 |
 | Windows | dwindle, window rules (plus a Firefox fullscreen fix), gestures | 2px square borders, 8px gaps, no blur/shadow/transparency |
 | Animations | CachyOS springs and slides | Workspace switch is the rice's 100ms fade |
 | Keys | All SUPER bindings, media/brightness keys via Noctalia | The whole ALT keymap (below) |

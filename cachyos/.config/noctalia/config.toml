@@ -27,7 +27,7 @@ thickness = 35
     padding = 6.0
 
 [shell]
-font_family = "Iosevka Oui"
+font_family = "Nordwand Mono"
 corner_radius_scale = 0.0
 popup_shadows = false
 clipboard_image_action_command = "swash --stdin --name \"swash-$(date +'%Y-%m-%d_%H:%M:%S').png\""

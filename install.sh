@@ -169,10 +169,10 @@ fi
 # ------------------------------------------------------------------- fonts ---
 
 echo "==> fonts"
-if fc-list | grep -i "Iosevka Oui" >/dev/null; then  # not -q: it closes the pipe early and pipefail trips on fc-list's SIGPIPE
-    echo "  Iosevka Oui present"
+if fc-list | grep -i "Nordwand Mono" >/dev/null; then  # not -q: it closes the pipe early and pipefail trips on fc-list's SIGPIPE
+    echo "  Nordwand Mono present"
 else
-    echo "  ! Iosevka Oui not installed — see README (Font); it is not vendored here"
+    echo "  ! Nordwand Mono not installed — see README (Font); it is not vendored here"
 fi
 
 # ------------------------------------------------------------------ lightdm ---
@@ -196,8 +196,8 @@ fi
 cat <<'EOF'
 
 Done. MANUAL steps that remain (see README.md):
-  1. Install the Iosevka Oui TTFs, if the font check above flagged them —
-     into ~/.local/share/fonts/IosevkaOui and /usr/local/share/fonts/IosevkaOui
+  1. Install the Nordwand Mono TTFs, if the font check above flagged them —
+     into ~/.local/share/fonts/NordwandMono and /usr/local/share/fonts/NordwandMono
      (the second copy is what LightDM uses), then `fc-cache -f`.
   2. Enable the Obsidian snippet: Settings > Appearance > CSS snippets > rice.
   3. Load the Firefox theme extension: about:debugging > This Firefox >

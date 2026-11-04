@@ -76,7 +76,7 @@ Then the manual steps `install.sh` prints at the end:
    unused). "Move left a space" / "Move right a space" must be **enabled**
    (install.sh sets this; verify in System Settings > Keyboard > Shortcuts >
    Mission Control — logout may be needed).
-5. **Iosevka Oui** font in `~/Library/Fonts`.
+5. **Nordwand Mono** font in `~/Library/Fonts`.
 6. iTerm2: set the profile colors to the rice palette so new windows match
    (the theme scripts only recolor open sessions).
 

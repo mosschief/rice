@@ -96,6 +96,6 @@ Done. MANUAL steps you still need (see README.md for details):
   4. If Alt+Shift+N window moves don't work, verify "Move left/right a space"
      shows enabled in System Settings > Keyboard > Shortcuts > Mission Control
      (a logout may be needed for the hotkey change to take effect).
-  5. Install the Iosevka Oui font into ~/Library/Fonts (used by sketchybar
+  5. Install the Nordwand Mono font into ~/Library/Fonts (used by sketchybar
      and the launcher).
 EOF

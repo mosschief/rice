@@ -10,7 +10,7 @@ apps=$( { ls -1 /Applications /System/Applications /System/Applications/Utilitie
         | grep '\.app$' | sed 's/\.app$//' | sort -u )
 
 choice=$(printf '%s\n' "$apps" | /opt/homebrew/bin/choose \
-            -f "Iosevka Oui" -s 18 -n 12 \
+            -f "Nordwand Mono" -s 18 -n 12 \
             -b "${RICE_ACCENT}" -c "${RICE_FG}" \
             -p "run:")
 
