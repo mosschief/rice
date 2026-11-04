@@ -1,4 +1,8 @@
-local mainMod = "SUPER"
+-- Base layer modifier. Flipped from SUPER to ALT so the whole desktop uses ALT.
+-- rice_binds.lua (also ALT, loaded after this file) is the authority on every
+-- chord the two share; the colliding base binds below were removed so rice wins.
+-- SUPER no longer drives any window-manager action.
+local mainMod = "ALT"
 local noctCall = "noctalia msg "
 local launchPrefix = LAUNCH_PREFIX -- config/variables.lua: uwsm where available
 
@@ -16,27 +20,18 @@ end
 -- Window manipulation
 hl.bind(mainMod .. " + Escape",      hl.dsp.exec_cmd("hyprctl kill"))
 hl.bind(mainMod .. " + Q",           hl.dsp.window.close())
-hl.bind(mainMod .. " + ALT + Space", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + D",           hl.dsp.window.fullscreen({ mode = 1 }))
-hl.bind(mainMod .. " + F",           hl.dsp.window.fullscreen())
-hl.bind(mainMod .. " + J",           hl.dsp.layout("togglesplit"))
+-- Removed (rice_binds wins): ALT+Space float (was SUPER+ALT), ALT+D fullscreen
+-- mode 1, ALT+F fullscreen, ALT+J togglesplit. rice has float on ALT+SHIFT+Space,
+-- fullscreen on ALT+F, togglesplit on ALT+H/V/E.
 
 -- Change focus
-hl.bind(mainMod .. " + Left",  hl.dsp.focus({ direction = "left" }))
-hl.bind(mainMod .. " + Right", hl.dsp.focus({ direction = "right" }))
-hl.bind(mainMod .. " + Up",    hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. " + Down",  hl.dsp.focus({ direction = "down" }))
--- ALT + Tab is the rice group-cycle bind (rice_binds.lua)
-hl.bind(mainMod .. " + Tab",   hl.dsp.exec_cmd(noctCall .. "window-switcher"))
+-- Removed (rice_binds wins): ALT+Left/Right/Up/Down focus. rice binds the same
+-- arrows plus J/K/L/semicolon to focus.
+-- Removed (rice_binds wins): ALT+Tab. rice uses ALT+Tab for group.next.
 
 -- Move active window around workspaces & monitors
-hl.bind(mainMod .. " + SHIFT + Up",                   hl.dsp.window.move({ direction = "u" }))
-hl.bind(mainMod .. " + SHIFT + Right",                hl.dsp.window.move({ direction = "r" }))
-hl.bind(mainMod .. " + SHIFT + Left",                 hl.dsp.window.move({ direction = "l" }))
-hl.bind(mainMod .. " + SHIFT + Down",                 hl.dsp.window.move({ direction = "d" }))
-hl.bind(mainMod .. " + SHIFT + " .. digitCode(1),     hl.dsp.window.move({ monitor = MONITOR1 }))
-hl.bind(mainMod .. " + SHIFT + " .. digitCode(2),     hl.dsp.window.move({ monitor = MONITOR2 }))
-hl.bind(mainMod .. " + SHIFT + " .. digitCode(3),     hl.dsp.window.move({ monitor = MONITOR3 }))
+-- Removed (rice_binds wins): ALT+SHIFT+Up/Right/Left/Down window move, and
+-- ALT+SHIFT+<digit> (rice moves the window to that workspace instead of a monitor).
 hl.bind(mainMod .. " + SHIFT + mouse_up",             hl.dsp.window.move({ monitor   = "-1" }))
 hl.bind(mainMod .. " + SHIFT + mouse_down",           hl.dsp.window.move({ monitor   = "+1" }))
 hl.bind(mainMod .. " + CONTROL + SHIFT + Right",      hl.dsp.window.move({ workspace = "m+1" }))
@@ -47,14 +42,15 @@ for i = 1, NUM_WPM do
     local key = i % 10
     hl.bind(mainMod .. " + SHIFT + CONTROL + " .. digitCode(key), hl.dsp.window.move({ workspace = "m~" .. i }))
 end
-for i = 1, NUM_WPM do
-    local key = i % 10
-    hl.bind(mainMod .. " + SHIFT + ALT + " .. digitCode(key), hl.dsp.window.move({ workspace = "m~" .. i, follow = false }))
-end
+-- Move window to a relative workspace without following it. Was SUPER+SHIFT+ALT;
+-- with the base layer now ALT, that collapses to ALT+SHIFT, which rice already
+-- uses to move a window to an absolute workspace. Re-homed to ALT+SHIFT+CONTROL
+-- with no-follow... which is also taken above. Dropped: no spare ALT+SHIFT+digit
+-- chord remains. Use the follow version (ALT+SHIFT+digit, rice) instead.
 
 -- Move & Resize with mouse
-hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag())
-hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize())
+-- Removed (rice_binds wins): ALT+mouse:272 drag, ALT+mouse:273 resize. rice
+-- binds the identical actions.
 
 -- Zoom
 local function zoomfunction(value)
@@ -67,7 +63,9 @@ local function zoomfunction(value)
         hl.config({ cursor = { zoom_factor = zoomvalue + value } })
     end
 end
-hl.bind(mainMod .. " + Minus", function() zoomfunction(-0.3) end, { repeating = true})
+-- Removed (rice_binds wins): ALT+Minus zoom-out collided with rice ALT+minus
+-- (toggle special workspace); Minus and minus are the same key. Zoom-out stays
+-- available on the keypad bind below (code:82).
 hl.bind(mainMod .. " + Plus", function() zoomfunction(0.3) end, { repeating = true })
 
 --# Zoom with keypad
@@ -79,19 +77,17 @@ hl.bind(mainMod .. " + code:86", function() zoomfunction(0.3) end, { repeating =
 ---- LAUNCHER ----
 ------------------
 
-hl.bind(mainMod .. " + Return",     hl.dsp.exec_cmd(launchPrefix .. TERMINAL))
-hl.bind(mainMod .. " + E",          hl.dsp.exec_cmd(launchPrefix .. FILE_MANAGER))
+-- Removed (rice_binds wins): ALT+Return terminal (rice has identical), ALT+E
+-- file manager (rice togglesplit), ALT+C calculator (rice browser), ALT+W
+-- browser (rice group toggle), ALT+L lock (rice focus up).
 hl.bind(mainMod .. " + T",          hl.dsp.exec_cmd(launchPrefix .. EDITOR))
-hl.bind(mainMod .. " + C",          hl.dsp.exec_cmd(launchPrefix .. CALCULATOR))
 hl.bind("XF86Calculator",           hl.dsp.exec_cmd(launchPrefix .. CALCULATOR))
-hl.bind(mainMod .. " + W",          hl.dsp.exec_cmd(launchPrefix .. BROWSER))
 hl.bind("CONTROL + SHIFT + Escape", hl.dsp.exec_cmd(launchPrefix .. TERMINAL .. " -e btop"))
 hl.bind(mainMod .. " + Z",          hl.dsp.exec_cmd(noctCall .. "settings-toggle"))
 hl.bind(mainMod .. " + X",          hl.dsp.exec_cmd(noctCall .. "panel-toggle control-center"))
 hl.bind(mainMod .. " + Space",      hl.dsp.exec_cmd(noctCall .. "panel-toggle launcher"))
 hl.bind(mainMod .. " + period",     hl.dsp.exec_cmd(noctCall .. "panel-toggle launcher /emo"))
-hl.bind(mainMod .. " + L",          hl.dsp.exec_cmd(os.getenv("HOME") .. "/.config/hypr/lock.sh"))
-hl.bind(mainMod .. " + ALT + C",    hl.dsp.exec_cmd(noctCall .. "panel-toggle session"))
+-- Removed: ALT+C session panel (was SUPER+ALT+C; collapses to ALT+C = rice browser).
 
 ---------------------------
 ---- HARDWARE CONTROLS ----
@@ -131,7 +127,7 @@ hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd(noctCall .. "screenshot-fullscree
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd(noctCall .. "panel-toggle wallpaper"))
 
 -- Clipboard
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd(noctCall .. "panel-toggle clipboard"))
+-- Removed (rice_binds wins): ALT+V clipboard (rice uses ALT+V for togglesplit).
 
 -- Notifications
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(noctCall .. "panel-toggle control-center notifications"))
@@ -141,16 +137,12 @@ hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(noctCall .. "panel-toggle control-cen
 -------------------------------
 
 -- Focus on monitors
-hl.bind(mainMod .. " + " .. digitCode(1), hl.dsp.focus({ monitor = MONITOR1 }))
-hl.bind(mainMod .. " + " .. digitCode(2), hl.dsp.focus({ monitor = MONITOR2 }))
-hl.bind(mainMod .. " + " .. digitCode(3), hl.dsp.focus({ monitor = MONITOR3 }))
+-- Removed (rice_binds wins): ALT+<digit> monitor focus. rice binds ALT+<digit>
+-- to focus that workspace number.
 
 -- Focus on workspace number
--- Absolute
-for i = 1, NUM_WPM do
-    local key = i % 10
-    hl.bind(mainMod .. " + ALT + " .. digitCode(key), hl.dsp.focus({ workspace = i }))
-end
+-- Absolute: removed. Was SUPER+ALT+<digit>; collapses to ALT+<digit>, which rice
+-- already binds to absolute workspace focus.
 -- Relative
 for i = 1, NUM_WPM do
     local key = i % 10
@@ -170,4 +162,5 @@ hl.bind(mainMod .. " + CONTROL + mouse_down", hl.dsp.focus({ workspace = "m+1" }
 
 -- Special workspace (scratchpad)
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special" }))
-hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special())
+-- Removed (rice_binds wins): ALT+S toggle special (rice uses ALT+S for group toggle;
+-- rice toggles special on ALT+minus).
