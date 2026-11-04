@@ -62,6 +62,16 @@ link "$VARIANT_DIR/.config/noctalia/palettes/rice.json" "$HOME/.config/noctalia/
 # missing, and writes through the link when it does, so linking is safe.
 link "$VARIANT_DIR/.config/kitty/kitty.conf"           "$HOME/.config/kitty/kitty.conf"
 link "$VARIANT_DIR/.config/kitty/shaders"              "$HOME/.config/kitty/shaders"
+link "$VARIANT_DIR/.config/bash/kitty-shake.bash"      "$HOME/.config/bash/kitty-shake.bash"
+# The shake shader fires on BEL, which this snippet rings when a command fails.
+# Appended once, at the end of ~/.bashrc so it runs after atuin's bash-preexec.
+SHAKE_SRC='[ -r ~/.config/bash/kitty-shake.bash ] && . ~/.config/bash/kitty-shake.bash'
+if grep -qF "$SHAKE_SRC" "$HOME/.bashrc" 2>/dev/null; then
+    echo "  ~/.bashrc already sources kitty-shake.bash"
+else
+    printf '\n# kitty screen-shake on failed commands (rice)\n%s\n' "$SHAKE_SRC" >> "$HOME/.bashrc"
+    echo "  appended: kitty-shake.bash source line to ~/.bashrc"
+fi
 
 link "$VARIANT_DIR/wallpapers/rice-day.png"   "$HOME/.local/share/wallpapers/rice-day.png"
 link "$VARIANT_DIR/wallpapers/rice-night.png" "$HOME/.local/share/wallpapers/rice-night.png"
