@@ -61,6 +61,7 @@ link "$VARIANT_DIR/.config/noctalia/palettes/rice.json" "$HOME/.config/noctalia/
 # Noctalia's kitty template only writes kitty.conf when the include line is
 # missing, and writes through the link when it does, so linking is safe.
 link "$VARIANT_DIR/.config/kitty/kitty.conf"           "$HOME/.config/kitty/kitty.conf"
+link "$VARIANT_DIR/.config/kitty/shaders"              "$HOME/.config/kitty/shaders"
 
 link "$VARIANT_DIR/wallpapers/rice-day.png"   "$HOME/.local/share/wallpapers/rice-day.png"
 link "$VARIANT_DIR/wallpapers/rice-night.png" "$HOME/.local/share/wallpapers/rice-night.png"
