@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""Generate Herdr app themes from the Noctalia rice palette.
+
+Reads cachyos/.config/noctalia/palettes/rice.json and writes one Herdr theme
+per mode, matching the kitty theme Noctalia renders from the same palette:
+
+    cachyos/.config/herdr-app/themes/rice-dark.json
+    cachyos/.config/herdr-app/themes/rice-light.json
+
+~/.config/herdr-app/settings.json names them as
+`"theme": {"dark": "rice-dark", "light": "rice-light"}`, so Herdr swaps them
+when Noctalia flips the GTK color-scheme. Rerun this after editing the palette.
+"""
+
+import json
+import os
+import sys
+from pathlib import Path
+
+RICE = Path(__file__).resolve().parent.parent
+PALETTE = RICE / "cachyos/.config/noctalia/palettes/rice.json"
+THEMES = RICE / "cachyos/.config/herdr-app/themes"
+
+ANSI_ORDER = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
+
+
+def theme(p: dict) -> dict:
+    """Map a Noctalia palette mode onto a Herdr theme file."""
+    t = p["terminal"]
+    return {
+        "background": t["background"],
+        "foreground": t["foreground"],
+        # Kitty inverts the selection; Herdr draws text over it, so use the outline tone.
+        "selection": p["mOutline"],
+        "cursor": t["cursor"],
+        "ansi": [t["normal"][c] for c in ANSI_ORDER] + [t["bright"][c] for c in ANSI_ORDER],
+        # Panel colors, so sidebars and bars match the Noctalia bar instead of
+        # Herdr's derived shades.
+        "colors": {
+            "canvas": p["mSurface"],
+            "chrome": p["mSurface"],
+            "surface": p["mSurfaceVariant"],
+            "popover": p["mSurfaceVariant"],
+            "raised": p["mSurfaceVariant"],
+            "hover": p["mHover"],
+            "selected": p["mOutline"],
+            "border": p["mSurfaceVariant"],
+            "input": p["mOutline"],
+            "muted": p["mOnSurfaceVariant"],
+            "accent": p["mPrimary"],
+            "accent_foreground": p["mOnPrimary"],
+            "solid": p["mPrimary"],
+            "solid_foreground": p["mOnPrimary"],
+        },
+    }
+
+
+def main() -> int:
+    palette = json.loads(PALETTE.read_text())
+    THEMES.mkdir(parents=True, exist_ok=True)
+    for mode in ("dark", "light"):
+        out = THEMES / f"rice-{mode}.json"
+        staging = out.with_suffix(".json.tmp")
+        staging.write_text(json.dumps(theme(palette[mode]), indent=2) + "\n")
+        os.replace(staging, out)  # atomic, so Herdr's watcher never reads half a file
+        print(out)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
