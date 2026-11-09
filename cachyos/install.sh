@@ -122,22 +122,15 @@ echo "  wrote:  ~/.mozilla/native-messaging-hosts/theme_switcher.json"
 # ------------------------------------------------------------------- fonts ---
 
 echo "==> fonts"
-# Nordwand Mono (https://github.com/tywr/Nordwand-Mono, OFL-1.1). Pinned
-# release, checked against the digest GitHub publishes for the asset.
-NORDWAND_VERSION=1.3.2
-NORDWAND_SHA256=2359518a2e6c74f50a89125730772e68de6c887951ff414e11b47ea528ce6a8a
-FONT_DIR="$HOME/.local/share/fonts/NordwandMono"
-if fc-list | grep -i "Nordwand Mono" >/dev/null; then  # not -q: it closes the pipe early and pipefail trips on fc-list's SIGPIPE
-    echo "  Nordwand Mono present"
+FONT_DIR="$HOME/.local/share/fonts/IosevkaOui"
+FONT_URL="https://williamjansson.com/files/rice/dots/fonts/TTF-Unhinted"
+if fc-list | grep -i "Iosevka Oui" >/dev/null; then  # not -q: it closes the pipe early and pipefail trips on fc-list's SIGPIPE
+    echo "  Iosevka Oui present"
 else
-    tmp="$(mktemp -d)"
-    curl -fsSL -o "$tmp/nordwand.zip" \
-        "https://github.com/tywr/Nordwand-Mono/releases/download/$NORDWAND_VERSION/NordwandMono-TTF.zip"
-    echo "$NORDWAND_SHA256  $tmp/nordwand.zip" | sha256sum -c --quiet
     mkdir -p "$FONT_DIR"
-    python3 -m zipfile -e "$tmp/nordwand.zip" "$tmp/ttf"
-    find "$tmp/ttf" -name '*.ttf' -exec cp {} "$FONT_DIR/" \;
-    rm -rf "$tmp"
+    for s in Regular Bold Light Extended ExtendedBold ExtendedLight SemiExtended SemiExtendedBold SemiExtendedLight; do
+        curl -fsSL -o "$FONT_DIR/IosevkaOui-$s.ttf" "$FONT_URL/IosevkaOui-$s.ttf"
+    done
     fc-cache -f "$FONT_DIR"
     echo "  installed: $FONT_DIR (restart Noctalia to pick it up)"
 fi

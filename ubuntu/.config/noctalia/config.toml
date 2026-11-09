@@ -29,7 +29,7 @@ thickness = 35
     padding = 6.0
 
 [shell]
-font_family = "Nordwand Mono"
+font_family = "Iosevka Oui"
 corner_radius_scale = 0.0
 popup_shadows = false
 launch_apps_as_systemd_services = true

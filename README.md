@@ -100,19 +100,19 @@ the swaynag confirmation.
 
 ## Font
 
-[Nordwand Mono](https://github.com/tywr/Nordwand-Mono) (OFL-1.1) — the one thing `install.sh` cannot do for you (it is not vendored here, and it checks for it at the end). The CachyOS and Ubuntu installers fetch it themselves. Download `NordwandMono-TTF.zip` from the [releases](https://github.com/tywr/Nordwand-Mono/releases), unzip it and install:
+[Iosevka Oui](https://williamjansson.com/files/rice/dots/fonts/TTF-Unhinted/) — the one thing `install.sh` cannot do for you (it is not vendored here, and it checks for it at the end). Download the TTFs and install:
 
 ```
-mkdir -p ~/.local/share/fonts/NordwandMono
-cp NordwandMono-*.ttf ~/.local/share/fonts/NordwandMono/
+mkdir -p ~/.local/share/fonts/IosevkaOui
+cp IosevkaOui-*.ttf ~/.local/share/fonts/IosevkaOui/
 fc-cache -f
 ```
 
 Also install system-wide so LightDM can use it:
 
 ```
-sudo mkdir -p /usr/local/share/fonts/NordwandMono
-sudo cp NordwandMono-*.ttf /usr/local/share/fonts/NordwandMono/
+sudo mkdir -p /usr/local/share/fonts/IosevkaOui
+sudo cp IosevkaOui-*.ttf /usr/local/share/fonts/IosevkaOui/
 sudo fc-cache -f
 ```
 
@@ -216,7 +216,7 @@ when the file already matches). Standalone equivalent:
 sudo install -Dm 644 etc/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf
 ```
 
-The greeter uses Nordwand Mono, so the font has to be installed system-wide as
+The greeter uses Iosevka Oui, so the font has to be installed system-wide as
 well as in `~/.local/share/fonts` — see [Font](#font).
 
 ## Status bar

@@ -7,7 +7,7 @@ CONFIG_DIR="${HOME}/.config/sketchybar"
 PLUGIN_DIR="${CONFIG_DIR}/plugins"
 . "${HOME}/.config/rice/colors.sh"
 
-FONT="Nordwand Mono"   # matches the rice font (installed in ~/Library/Fonts)
+FONT="Iosevka Oui"   # matches the rice font (installed in ~/Library/Fonts)
 
 sketchybar --bar height=28 position=top sticky=on topmost=off display=main \
                  padding_left=8 padding_right=8 color="${RICE_BG_ARGB}"

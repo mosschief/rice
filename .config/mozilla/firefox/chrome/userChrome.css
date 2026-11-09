@@ -1,4 +1,4 @@
-/* minimal-functional-fox — rice palette (williamjansson) + Nordwand Mono */
+/* minimal-functional-fox — rice palette (williamjansson) + Iosevka Oui */
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -9,7 +9,7 @@
     --mff-sidebar-color: #000000;
     --mff-tab-border-radius: 0px;
     --mff-tab-color: #000000;
-    --mff-tab-font-family: "Nordwand Mono", sans;
+    --mff-tab-font-family: "Iosevka Oui", sans;
     --mff-tab-font-size: 11pt;
     --mff-tab-font-weight: 400;
     --mff-tab-height: 30px;
@@ -19,11 +19,11 @@
     --mff-tab-soundplaying-bg: #deddd1;
     --mff-urlbar-color: #888888;
     --mff-urlbar-focused-color: #000000;
-    --mff-urlbar-font-family: "Nordwand Mono", sans;
+    --mff-urlbar-font-family: "Iosevka Oui", sans;
     --mff-urlbar-font-size: 11pt;
     --mff-urlbar-font-weight: 400;
     --mff-urlbar-results-color: #000000;
-    --mff-urlbar-results-font-family: "Nordwand Mono", monospace;
+    --mff-urlbar-results-font-family: "Iosevka Oui", monospace;
     --mff-urlbar-results-font-size: 11pt;
     --mff-urlbar-results-font-weight: 400;
     --mff-urlbar-results-url-color: #888888;
@@ -47,7 +47,7 @@
     --mff-sidebar-color: #f2f1e5;
     --mff-tab-border-radius: 0px;
     --mff-tab-color: #f2f1e5;
-    --mff-tab-font-family: "Nordwand Mono", sans;
+    --mff-tab-font-family: "Iosevka Oui", sans;
     --mff-tab-font-size: 11pt;
     --mff-tab-font-weight: 400;
     --mff-tab-height: 30px;
@@ -57,11 +57,11 @@
     --mff-tab-soundplaying-bg: #2e2d26;
     --mff-urlbar-color: #88887e;
     --mff-urlbar-focused-color: #f2f1e5;
-    --mff-urlbar-font-family: "Nordwand Mono", sans;
+    --mff-urlbar-font-family: "Iosevka Oui", sans;
     --mff-urlbar-font-size: 11pt;
     --mff-urlbar-font-weight: 400;
     --mff-urlbar-results-color: #f2f1e5;
-    --mff-urlbar-results-font-family: "Nordwand Mono", monospace;
+    --mff-urlbar-results-font-family: "Iosevka Oui", monospace;
     --mff-urlbar-results-font-size: 11pt;
     --mff-urlbar-results-font-weight: 400;
     --mff-urlbar-results-url-color: #88887e;
