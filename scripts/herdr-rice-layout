@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""Build a square, flat Herdr layout that matches the rice Hyprland look.
+
+Herdr has no global corner radius: the shipped mods call `.rounded(n)`
+themselves, and shipped mods and layouts are read-only. So this script
+
+1. clones the mods the main layout uses to `rice-<mod>` (herdr-app mod.clone,
+   which rewrites their asset paths), from fresh copies of the shipped ones,
+2. sets every `.rounded(n)` (and per-corner form) in the clones to 0,
+3. writes layouts/rice.json from the shipped layouts/main.json with
+   Hyprland's numbers (cachyos/.config/hypr/config/decorations.lua): 0 rounding,
+   8px between panes and around the work area, 2px borders, the active border
+   in the foreground colour, and no terminal padding (kitty has none).
+
+Colours come from the rice-dark/rice-light themes (scripts/herdr-theme).
+Rerun after a Herdr update to pick up changes to the shipped mods.
+"""
+
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+HOME = Path(os.environ.get("HERDR_APP_HOME", Path.home() / ".config/herdr-app"))
+MODS = ["workspace-chrome", "spaces", "agents", "tabs", "pane", "workspace-status"]
+PREFIX = "rice-"
+
+# rice decorations.lua: gaps_in 4 (8px between windows), gaps_out 8, border_size 2
+GAP, OUTER, BORDER = 8, 8, 2
+
+# .rounded(n) and the per-corner forms (.rounded_bl(n), ...). .rounded_full() stays:
+# it draws status dots, not frames.
+ROUNDED = re.compile(r"\.(rounded(?:_(?:tl|tr|bl|br|t|b|l|r))?)\((?:[^()]|\([^()]*\))*\)")
+
+
+def herdr(command: str, args: dict) -> None:
+    subprocess.run(["herdr-app", "do", command, json.dumps(args)], check=True,
+                   stdout=subprocess.DEVNULL)
+
+
+def clone_mod(name: str) -> None:
+    target = HOME / "mods" / f"{PREFIX}{name}"
+    if target.exists():
+        shutil.rmtree(target)  # always rebuild from the shipped mod
+    herdr("mod.clone", {"name": name, "as": target.name})
+    for js in target.rglob("*.js"):
+        src = js.read_text()
+        out = ROUNDED.sub(lambda m: f".{m.group(1)}(0)", src)
+        if out != src:
+            js.write_text(out)
+
+
+def retarget(node):
+    """Point mod references at the clones and square every frame."""
+    if isinstance(node, dict):
+        content = node.get("content")
+        if isinstance(content, dict) and content.get("mod") in MODS:
+            content["mod"] = PREFIX + content["mod"]
+        if "radius" in node:
+            node["radius"] = 0
+        for value in node.values():
+            retarget(value)
+    elif isinstance(node, list):
+        for value in node:
+            retarget(value)
+
+
+def find(node, node_id):
+    if isinstance(node, dict):
+        if node.get("id") == node_id:
+            return node
+        for child in node.get("children", []):
+            hit = find(child, node_id)
+            if hit:
+                return hit
+    return None
+
+
+def main() -> int:
+    for name in MODS:
+        clone_mod(name)
+
+    layout = json.loads((HOME / "layouts/main.json").read_text())
+    retarget(layout)
+    layout["terminal_padding"] = [0, 0]
+
+    body = find(layout, "work-body")
+    body["padding"], body["gap"] = OUTER, GAP
+
+    pane = find(layout, "main")["content"]["pane"]
+    pane.update({
+        "gap": GAP,
+        "radius": 0,
+        # inactive border: Hyprland's inactive colour is the palette's surface variant
+        "border": {"width": BORDER, "color": "raised"},
+        "focus": {"width": BORDER, "color": "foreground"},
+    })
+
+    out = HOME / "layouts/rice.json"
+    staging = out.with_suffix(".json.tmp")
+    staging.write_text(json.dumps(layout, indent=2) + "\n")
+    os.replace(staging, out)
+    print(out)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
